@@ -49,6 +49,8 @@ export default function ExamSuggestionPage() {
     },
   });
 
+  const level = form.watch('level');
+
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
     setExamSuggestions([]);
@@ -228,7 +230,7 @@ export default function ExamSuggestionPage() {
                                         <SelectItem value="1ère année">1ère année</SelectItem>
                                         <SelectItem value="2ème année">2ème année</SelectItem>
                                         <SelectItem value="3ème année">3ème année</SelectItem>
-                                        <SelectItem value="4ème année">4ème année (pour le moyen)</SelectItem>
+                                        {level === 'Enseignement moyen' && <SelectItem value="4ème année">4ème année (pour le moyen)</SelectItem>}
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -385,3 +387,5 @@ export default function ExamSuggestionPage() {
     </div>
   );
 }
+
+    

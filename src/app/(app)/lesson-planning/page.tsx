@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { aiAssistedLessonPlanning, type AiAssistedLessonPlanningInput } from '@/ai/flows/ai-assisted-lesson-planning';
 import jsPDF from 'jspdf';
 import { marked } from 'marked';
+import html2canvas from 'html2canvas';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,6 +46,8 @@ export default function LessonPlanningPage() {
       prerequisiteKnowledge: '',
     },
   });
+
+  const level = form.watch('level');
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
@@ -97,7 +100,7 @@ export default function LessonPlanningPage() {
       const lessonPlanHtml = lessonPlanElement.outerHTML;
       
       const combinedHtml = `
-        <div style="font-family: 'PT Sans', sans-serif; color: black;">
+        <div style="font-family: 'PT Sans', sans-serif; color: black; width: 525pt">
           ${headerHtml}
           ${lessonPlanHtml}
         </div>
@@ -107,10 +110,11 @@ export default function LessonPlanningPage() {
         callback: function (doc) {
           doc.save(`Plan_de_leçon_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
         },
-        x: 15,
-        y: 15,
-        width: 565, // A4 width in points (595) minus margins
-        windowWidth: 1000, // virtual window width
+        x: 35,
+        y: 35,
+        html2canvas: {
+          scale: 0.7
+        },
         autoPaging: 'text',
       });
 
@@ -122,6 +126,7 @@ export default function LessonPlanningPage() {
       setIsDownloading(false);
     }
   };
+
 
   const handlePrint = () => {
     const printContent = document.getElementById('lesson-plan');
@@ -225,7 +230,7 @@ export default function LessonPlanningPage() {
                                   <SelectItem value="1ère année">1ère année</SelectItem>
                                   <SelectItem value="2ème année">2ème année</SelectItem>
                                   <SelectItem value="3ème année">3ème année</SelectItem>
-                                  <SelectItem value="4ème année">4ème année (pour le moyen)</SelectItem>
+                                  {level === 'Enseignement moyen' && <SelectItem value="4ème année">4ème année (pour le moyen)</SelectItem>}
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -333,3 +338,5 @@ export default function LessonPlanningPage() {
     </div>
   );
 }
+
+    
