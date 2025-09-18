@@ -95,11 +95,13 @@ export default function LessonPlanningPage() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
+      // Add header
       const headerCanvas = await html2canvas(headerElement, { scale: 2 });
       const headerImgData = headerCanvas.toDataURL('image/png');
       const headerImgProps = pdf.getImageProperties(headerImgData);
       const headerImgHeight = (headerImgProps.height * pdfWidth) / headerImgProps.width;
       
+      // Add content
       const contentCanvas = await html2canvas(lessonPlanElement, { scale: 2 });
       const contentImgData = contentCanvas.toDataURL('image/png');
       const contentImgProps = pdf.getImageProperties(contentImgData);
@@ -113,8 +115,8 @@ export default function LessonPlanningPage() {
       heightLeft -= (pdfHeight - position);
 
       while (heightLeft > 0) {
+        position = heightLeft - contentImgHeight;
         pdf.addPage();
-        position = -pdfHeight * (Math.floor(contentImgHeight / (pdfHeight - position)) - 1);
         pdf.addImage(contentImgData, 'PNG', 0, position, pdfWidth, contentImgHeight);
         heightLeft -= pdfHeight;
       }
