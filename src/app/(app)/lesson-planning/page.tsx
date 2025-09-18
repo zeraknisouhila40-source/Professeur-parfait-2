@@ -95,37 +95,30 @@ export default function LessonPlanningPage() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      const addContentToPdf = async (element: HTMLElement, withHeader: boolean) => {
-        let position = 0;
-        if (withHeader) {
-          const headerCanvas = await html2canvas(headerElement, { scale: 2 });
-          const headerImgData = headerCanvas.toDataURL('image/png');
-          const headerImgProps = pdf.getImageProperties(headerImgData);
-          const headerImgHeight = (headerImgProps.height * pdfWidth) / headerImgProps.width;
-          pdf.addImage(headerImgData, 'PNG', 0, 0, pdfWidth, headerImgHeight);
-          position = headerImgHeight;
-        }
+      const headerCanvas = await html2canvas(headerElement, { scale: 2 });
+      const headerImgData = headerCanvas.toDataURL('image/png');
+      const headerImgProps = pdf.getImageProperties(headerImgData);
+      const headerImgHeight = (headerImgProps.height * pdfWidth) / headerImgProps.width;
+      
+      const contentCanvas = await html2canvas(lessonPlanElement, { scale: 2 });
+      const contentImgData = contentCanvas.toDataURL('image/png');
+      const contentImgProps = pdf.getImageProperties(contentImgData);
+      let contentImgHeight = (contentImgProps.height * pdfWidth) / contentImgProps.width;
+      
+      let heightLeft = contentImgHeight;
+      let position = headerImgHeight;
 
-        const canvas = await html2canvas(element, { scale: 2, windowWidth: element.scrollWidth, windowHeight: element.scrollHeight });
-        const imgData = canvas.toDataURL('image/png');
-        const imgProps = pdf.getImageProperties(imgData);
-        let imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        let heightLeft = imgHeight;
-        
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-        heightLeft -= (pdfHeight - position);
+      pdf.addImage(headerImgData, 'PNG', 0, 0, pdfWidth, headerImgHeight);
+      pdf.addImage(contentImgData, 'PNG', 0, position, pdfWidth, contentImgHeight);
+      heightLeft -= (pdfHeight - position);
 
-        let page = 1;
-        while (heightLeft > 0) {
-            pdf.addPage();
-            page++;
-            const yPos = -(pdfHeight * (page-1)) + position;
-            pdf.addImage(imgData, 'PNG', 0, yPos, pdfWidth, imgHeight);
-            heightLeft -= pdfHeight;
-        }
-      };
-
-      await addContentToPdf(lessonPlanElement, true);
+      while (heightLeft > 0) {
+        pdf.addPage();
+        position = -pdfHeight * (Math.floor(contentImgHeight / (pdfHeight - position)) - 1);
+        pdf.addImage(contentImgData, 'PNG', 0, position, pdfWidth, contentImgHeight);
+        heightLeft -= pdfHeight;
+      }
+      
       pdf.save(`Plan_de_leçon_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
       
       toast({ title: 'Téléchargement réussi', description: 'Le PDF du plan de leçon a été téléchargé.' });
@@ -172,13 +165,13 @@ export default function LessonPlanningPage() {
 
   return (
     <div className="space-y-6">
+      <div className="hidden">
+        <PdfHeader id="pdf-header-lesson" />
+      </div>
       <PageHeader
         title="Planification de Leçon"
         description="Créez des plans de cours détaillés avec l'aide de l'IA."
       />
-      <div className="hidden">
-        <PdfHeader id="pdf-header-lesson" />
-      </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
