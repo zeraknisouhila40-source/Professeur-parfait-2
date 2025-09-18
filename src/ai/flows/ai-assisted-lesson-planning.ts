@@ -36,7 +36,7 @@ const AiAssistedLessonPlanningOutputSchema = z.object({
   lessonPlan: z
     .string()
     .describe(
-      'A detailed lesson plan including objectives, activities, and assessments.'
+      'A detailed lesson plan including objectives, activities, and assessments, formatted in Markdown.'
     ),
 });
 export type AiAssistedLessonPlanningOutput = z.infer<
@@ -66,7 +66,7 @@ const prompt = ai.definePrompt({
 
   Ensure the lesson plan is well-structured and aligned with the Algerian educational guidelines for teaching French.
 
-  Output the lesson plan in a detailed, easy-to-understand format.
+  Output the lesson plan in a detailed, easy-to-understand format using Markdown.
   `,
 });
 
