@@ -55,7 +55,7 @@ const prompt = ai.definePrompt({
   name: 'suggestExamQuestionsPrompt',
   input: {schema: SuggestExamQuestionsInputSchema},
   output: {schema: SuggestExamQuestionsOutputSchema},
-  prompt: `You are an AI assistant designed to help French teachers in Algeria create complete exams.
+  prompt: `You are an AI assistant designed to help French teachers in Algeria create complete exams based on the Algerian education system.
 
   Generate {{numberOfSuggestions}} distinct exam suggestions.
   {{#if topic}}

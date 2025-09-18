@@ -47,7 +47,7 @@ const prompt = ai.definePrompt({
   name: 'correctAssignmentPrompt',
   input: {schema: CorrectAssignmentInputSchema},
   output: {schema: CorrectAssignmentOutputSchema},
-  prompt: `You are an expert French teacher specializing in identifying common errors and suggesting corrections in student assignments.
+  prompt: `You are an expert French teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.
 
 You will use this information to correct the student's assignment, identify common errors, and suggest improvements.
 

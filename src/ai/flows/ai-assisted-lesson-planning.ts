@@ -50,7 +50,7 @@ const prompt = ai.definePrompt({
   name: 'aiAssistedLessonPlanningPrompt',
   input: {schema: AiAssistedLessonPlanningInputSchema},
   output: {schema: AiAssistedLessonPlanningOutputSchema},
-  prompt: `You are an AI assistant designed to help French teachers in Algeria create effective lesson plans.
+  prompt: `You are an AI assistant designed to help French teachers in Algeria create effective lesson plans based on the Algerian education system.
 
   Based on the topic, number of class meetings, and prerequisite knowledge provided, generate a comprehensive lesson plan that includes clear objectives, engaging activities, and appropriate assessments.
 

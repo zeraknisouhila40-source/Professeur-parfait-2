@@ -40,7 +40,7 @@ const prompt = ai.definePrompt({
   name: 'generateHomeworkExercisesPrompt',
   input: {schema: GenerateHomeworkExercisesInputSchema},
   output: {schema: GenerateHomeworkExercisesOutputSchema},
-  prompt: `You are an AI assistant designed to help French teachers in Algeria create homework exercises.
+  prompt: `You are an AI assistant designed to help French teachers in Algeria create homework exercises according to the Algerian education system.
 
   Generate {{quantity}} homework exercises for the topic: {{topic}}.
   The exercises should be appropriate for students with a {{skillLevel}} skill level and at the {{educationalStage}} educational stage.
