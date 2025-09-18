@@ -24,7 +24,7 @@ import { PdfHeader } from '@/components/pdf-header';
 const formSchema = z.object({
   topic: z.string().min(3, { message: 'Le sujet doit contenir au moins 3 caractères.' }),
   numberOfClassMeetings: z.coerce.number().int().min(1, { message: 'Doit être au moins 1.' }).max(20, { message: 'Ne peut pas dépasser 20.' }),
-  prerequisiteKnowledge: z.string().min(10, { message: 'Les prérequis doivent contenir au moins 10 caractères.' }),
+  prerequisiteKnowledge: z.string().optional(),
   level: z.string({ required_error: 'Veuillez sélectionner un niveau.' }),
   year: z.string({ required_error: 'Veuillez sélectionner une année.' }),
   trimester: z.string({ required_error: 'Veuillez sélectionner un trimestre.' }),
@@ -43,7 +43,7 @@ export default function LessonPlanningPage() {
     defaultValues: {
       topic: '',
       numberOfClassMeetings: 3,
-      prerequisiteKnowledge: 'Les élèves connaissent les verbes de base et la structure des phrases simples.',
+      prerequisiteKnowledge: '',
     },
   });
 
@@ -255,7 +255,7 @@ export default function LessonPlanningPage() {
                     name="prerequisiteKnowledge"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Connaissances préalables</FormLabel>
+                        <FormLabel>Connaissances préalables (Optionnel)</FormLabel>
                         <FormControl>
                           <Textarea rows={4} placeholder="Décrivez ce que les élèves savent déjà..." {...field} />
                         </FormControl>

@@ -21,6 +21,7 @@ const AiAssistedLessonPlanningInputSchema = z.object({
     .describe('The desired number of class meetings for the lesson plan.'),
   prerequisiteKnowledge: z
     .string()
+    .optional()
     .describe(
       "The students' existing knowledge and skills related to the topic."
     ),
@@ -62,7 +63,9 @@ const prompt = ai.definePrompt({
   Year: {{{year}}}
   Trimester: {{{trimester}}}
   Number of Class Meetings: {{{numberOfClassMeetings}}}
+  {{#if prerequisiteKnowledge}}
   Prerequisite Knowledge: {{{prerequisiteKnowledge}}}
+  {{/if}}
 
   Ensure the lesson plan is well-structured and aligned with the Algerian educational guidelines for teaching French.
 
