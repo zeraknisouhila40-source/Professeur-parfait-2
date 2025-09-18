@@ -32,15 +32,14 @@ export type SuggestExamQuestionsInput = z.infer<
 
 const ExamSuggestionSchema = z.object({
   title: z.string().describe('A title for this exam suggestion.'),
-  questions: z
-    .array(z.string())
-    .describe('An array of suggested exam questions.'),
+  examPaper: z.string().describe('The complete exam paper, including questions, scoring tables, and image placeholders if necessary. Use Markdown for formatting.'),
+  answerKey: z.string().describe('The corresponding answer key for the exam paper, formatted for the teacher. Use Markdown for formatting.'),
 });
 
 const SuggestExamQuestionsOutputSchema = z.object({
   suggestions: z
     .array(ExamSuggestionSchema)
-    .describe('An array of distinct exam suggestions, each with a title and a list of questions.'),
+    .describe('An array of distinct exam suggestions, each with a title, a full exam paper, and a separate answer key.'),
 });
 export type SuggestExamQuestionsOutput = z.infer<
   typeof SuggestExamQuestionsOutputSchema
@@ -56,7 +55,7 @@ const prompt = ai.definePrompt({
   name: 'suggestExamQuestionsPrompt',
   input: {schema: SuggestExamQuestionsInputSchema},
   output: {schema: SuggestExamQuestionsOutputSchema},
-  prompt: `You are an AI assistant designed to help French teachers in Algeria create exams.
+  prompt: `You are an AI assistant designed to help French teachers in Algeria create complete exams.
 
   Generate {{numberOfSuggestions}} distinct exam suggestions.
   {{#if topic}}
@@ -66,12 +65,14 @@ const prompt = ai.definePrompt({
   The suggestions should incorporate the following keywords: "{{keywords}}".
   {{/if}}
   
-  Each suggestion should have a unique title and {{numberOfQuestions}} questions.
+  Each suggestion should have a unique title and a complete exam paper with {{numberOfQuestions}} questions.
   The questions should align with the Algerian curriculum for the educational level: {{level}}, {{year}}, for the {{trimester}}.
 
-  Ensure that the questions are relevant, comprehensive, and appropriate for the specified educational level.
+  For each suggestion, provide two parts:
+  1.  **examPaper**: The full exam paper, ready to be given to students. It should be well-formatted using Markdown. Include tables for scoring points for each exercise. If an image is relevant, use a Markdown placeholder like '![Description for image]'.
+  2.  **answerKey**: A separate, complete answer key for the teacher, also formatted in Markdown.
 
-  Please provide the suggestions with titles and numbered lists of questions.
+  Ensure that the content is relevant, comprehensive, and appropriate for the specified educational level.
   `,
 });
 

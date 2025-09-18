@@ -10,22 +10,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 const formSchema = z.object({
-  topic: z.string().min(3, { message: 'Le sujet doit contenir au moins 3 caractères.' }),
-  difficulty: z.enum(['easy', 'medium', 'hard']),
-  curriculumAlignment: z.string().min(10, { message: 'Le programme doit contenir au moins 10 caractères.' }),
-  numberOfQuestions: z.coerce.number().int().min(1, { message: 'Doit être au moins 1.' }).max(10, { message: 'Ne peut pas dépasser 10.' }),
-  educationalLevel: z.string({ required_error: 'Veuillez sélectionner un niveau.' }),
+  topic: z.string().optional(),
+  keywords: z.string().optional(),
+  level: z.string({ required_error: 'Veuillez sélectionner un niveau.' }),
+  year: z.string({ required_error: 'Veuillez sélectionner une année.' }),
+  trimester: z.string({ required_error: 'Veuillez sélectionner un trimestre.' }),
+  numberOfQuestions: z.coerce.number().int().min(1).max(10).default(5),
 });
 
 type FormValues = z.infer<typeof formSchema>;
+type ExamSuggestion = SuggestExamQuestionsOutput['suggestions'][0];
 
 export default function ExamSuggestionPage() {
   const [examSuggestions, setExamSuggestions] = useState<SuggestExamQuestionsOutput['suggestions']>([]);
@@ -36,8 +39,7 @@ export default function ExamSuggestionPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       topic: '',
-      difficulty: 'medium',
-      curriculumAlignment: 'Programme de français algérien pour le secondaire',
+      keywords: '',
       numberOfQuestions: 5,
     },
   });
@@ -64,11 +66,11 @@ export default function ExamSuggestionPage() {
     }
   };
 
-  const applySuggestion = (suggestion: { title: string, questions: string[] }) => {
+  const applySuggestion = (suggestion: ExamSuggestion) => {
     console.log("Applying suggestion:", suggestion);
     toast({
       title: `Suggestion '${suggestion.title}' appliquée`,
-      description: "Les questions ont été enregistrées.",
+      description: "L'examen a été enregistré.",
     });
   };
 
@@ -76,108 +78,126 @@ export default function ExamSuggestionPage() {
     <div className="space-y-6">
       <PageHeader
         title="Suggestion d'Examen"
-        description="Générez des questions d'examen sur mesure en quelques secondes."
+        description="Générez des examens complets sur mesure en quelques secondes."
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
             <Card className="sticky top-20">
                 <CardHeader>
                     <CardTitle>Paramètres de l'examen</CardTitle>
-                    <CardDescription>Remplissez les détails pour générer les questions.</CardDescription>
+                    <CardDescription>Remplissez les détails pour générer les suggestions.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                         <FormField
-                        control={form.control}
-                        name="topic"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Sujet</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Ex: La Révolution Algérienne" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
+                            control={form.control}
+                            name="level"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Niveau</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Choisir le niveau" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    <SelectItem value="Enseignement moyen">Enseignement moyen</SelectItem>
+                                    <SelectItem value="Enseignement secondaire">Enseignement secondaire</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
                         />
                         <FormField
-                          control={form.control}
-                          name="educationalLevel"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Niveau Éducatif</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            control={form.control}
+                            name="year"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Année</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Choisir l'année" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="1ère année">1ère année</SelectItem>
+                                        <SelectItem value="2ème année">2ème année</SelectItem>
+                                        <SelectItem value="3ème année">3ème année</SelectItem>
+                                        <SelectItem value="4ème année">4ème année (pour le moyen)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="trimester"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Trimestre</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Choisir le trimestre" />
+                                    </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                    <SelectItem value="1er trimestre">1er trimestre</SelectItem>
+                                    <SelectItem value="2ème trimestre">2ème trimestre</SelectItem>
+                                    <SelectItem value="3ème trimestre">3ème trimestre</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="topic"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Sujet (Optionnel)</FormLabel>
                                 <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Choisir un niveau" />
-                                  </SelectTrigger>
+                                    <Input placeholder="Ex: La Révolution Algérienne" {...field} />
                                 </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Enseignement moyen - 1ère année">Enseignement moyen - 1ère année</SelectItem>
-                                  <SelectItem value="Enseignement moyen - 2ème année">Enseignement moyen - 2ème année</SelectItem>
-                                  <SelectItem value="Enseignement moyen - 3ème année">Enseignement moyen - 3ème année</SelectItem>
-                                  <SelectItem value="Enseignement moyen - 4ème année">Enseignement moyen - 4ème année</SelectItem>
-                                  <SelectItem value="Enseignement secondaire - 1ère année">Enseignement secondaire - 1ère année</SelectItem>
-                                  <SelectItem value="Enseignement secondaire - 2ème année">Enseignement secondaire - 2ème année</SelectItem>
-                                  <SelectItem value="Enseignement secondaire - 3ème année">Enseignement secondaire - 3ème année</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                                <FormMessage />
+                                </FormItem>
+                            )}
                         />
                         <FormField
-                        control={form.control}
-                        name="difficulty"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Difficulté</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            control={form.control}
+                            name="keywords"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Mots-clés (Optionnel)</FormLabel>
                                 <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Choisir une difficulté" />
-                                </SelectTrigger>
+                                    <Input placeholder="Ex: Histoire, Culture, Personnages" {...field} />
                                 </FormControl>
-                                <SelectContent>
-                                <SelectItem value="easy">Facile</SelectItem>
-                                <SelectItem value="medium">Moyen</SelectItem>
-                                <SelectItem value="hard">Difficile</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                            </FormItem>
-                        )}
+                                <FormMessage />
+                                </FormItem>
+                            )}
                         />
                         <FormField
-                        control={form.control}
-                        name="curriculumAlignment"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Alignement Curriculaire</FormLabel>
-                            <FormControl>
-                                <Textarea rows={4} placeholder="Décrivez les normes du programme à respecter" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                        control={form.control}
-                        name="numberOfQuestions"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Nombre de questions</FormLabel>
-                            <FormControl>
-                                <Input type="number" min="1" max="10" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
+                            control={form.control}
+                            name="numberOfQuestions"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Nombre de questions</FormLabel>
+                                <FormControl>
+                                    <Input type="number" min="1" max="10" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
                         />
                         <Button type="submit" disabled={isLoading} className="w-full">
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Générer les suggestions
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Générer les suggestions
                         </Button>
                     </form>
                     </Form>
@@ -213,11 +233,22 @@ export default function ExamSuggestionPage() {
                                     </AccordionTrigger>
                                     <AccordionContent>
                                         <div className="space-y-4 pt-2">
-                                            <ol className="list-decimal list-outside space-y-3 pl-5">
-                                                {suggestion.questions.map((q, i) => (
-                                                    <li key={i} className="bg-background/50 p-3 rounded-md pl-4">{q}</li>
-                                                ))}
-                                            </ol>
+                                            <Tabs defaultValue="exam-paper" className="w-full">
+                                                <TabsList className="grid w-full grid-cols-2">
+                                                    <TabsTrigger value="exam-paper">Épreuve de l'examen</TabsTrigger>
+                                                    <TabsTrigger value="answer-key">Corrigé</TabsTrigger>
+                                                </TabsList>
+                                                <TabsContent value="exam-paper">
+                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60">
+                                                        <pre className="text-wrap text-sm bg-transparent p-0 font-sans">{suggestion.examPaper}</pre>
+                                                    </div>
+                                                </TabsContent>
+                                                <TabsContent value="answer-key">
+                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60">
+                                                        <pre className="text-wrap text-sm bg-transparent p-0 font-sans">{suggestion.answerKey}</pre>
+                                                    </div>
+                                                </TabsContent>
+                                            </Tabs>
                                             <Button onClick={() => applySuggestion(suggestion)} className="w-full">
                                                 Appliquer cette suggestion
                                             </Button>
