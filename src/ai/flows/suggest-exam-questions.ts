@@ -80,7 +80,15 @@ const prompt = ai.definePrompt({
   Ensure that the content is relevant, comprehensive, and appropriate for the specified educational level.
   The final output must be a JSON object that strictly follows this schema:
   
-  {{jsonSchema output}}
+  {
+    "suggestions": [
+      {
+        "title": "...",
+        "examPaper": "...",
+        "answerKey": "..."
+      }
+    ]
+  }
   `,
 });
 
