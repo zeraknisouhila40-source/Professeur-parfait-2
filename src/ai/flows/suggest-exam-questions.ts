@@ -57,7 +57,7 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestExamQuestionsOutputSchema},
   prompt: `You are an AI assistant designed to help French teachers in Algeria create complete exams based on the Algerian education system.
 
-  Generate exactly 2 distinct exam suggestions.
+  Generate exactly {{numberOfSuggestions}} distinct exam suggestions.
 
   The first suggestion should be a 'synthèse' (comprehensive composition) exam. This type of exam should be designed for students to write their answers on a separate paper. It should include a text for comprehension, followed by questions, grammar exercises, and a writing section ('production écrite').
 
@@ -70,14 +70,17 @@ const prompt = ai.definePrompt({
   The suggestions should incorporate the following keywords: "{{keywords}}".
   {{/if}}
 
-  Each suggestion should have a unique title and a complete exam paper with {{numberOfQuestions}} questions.
-  The questions should align with the Algerian curriculum for the educational level: {{level}}, {{year}}, for the {{trimester}}.
+  Each suggestion must have a unique title, a complete exam paper with {{numberOfQuestions}} questions, and a separate answer key.
+  The questions must align with the Algerian curriculum for the educational level: {{level}}, {{year}}, for the {{trimester}}.
 
   For each suggestion, provide two parts:
-  1.  **examPaper**: The full exam paper, ready to be given to students. It should be well-formatted using Markdown. Include tables for scoring points for each exercise. If an image is relevant, use a Markdown placeholder like '![Image description](https://picsum.photos/seed/1/600/400)'. Use a different seed for each image.
+  1.  **examPaper**: The full exam paper, ready to be given to students. It must be well-formatted using Markdown. Include tables for scoring points for each exercise. If an image is relevant, use a Markdown placeholder like '![Image description](https://picsum.photos/seed/1/600/400)'. Use a different seed for each image.
   2.  **answerKey**: A separate, complete answer key for the teacher, also formatted in Markdown.
 
   Ensure that the content is relevant, comprehensive, and appropriate for the specified educational level.
+  The final output must be a JSON object that strictly follows this schema:
+  
+  {{jsonSchema output}}
   `,
 });
 
