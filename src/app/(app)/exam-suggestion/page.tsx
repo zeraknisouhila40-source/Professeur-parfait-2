@@ -239,14 +239,10 @@ export default function ExamSuggestionPage() {
                                                     <TabsTrigger value="answer-key">Corrigé</TabsTrigger>
                                                 </TabsList>
                                                 <TabsContent value="exam-paper">
-                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60">
-                                                        <pre className="text-wrap text-sm bg-transparent p-0 font-sans">{suggestion.examPaper}</pre>
-                                                    </div>
+                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: suggestion.examPaper.replace(/\\n/g, '<br />') }} />
                                                 </TabsContent>
                                                 <TabsContent value="answer-key">
-                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60">
-                                                        <pre className="text-wrap text-sm bg-transparent p-0 font-sans">{suggestion.answerKey}</pre>
-                                                    </div>
+                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: suggestion.answerKey.replace(/\\n/g, '<br />') }} />
                                                 </TabsContent>
                                             </Tabs>
                                             <Button onClick={() => applySuggestion(suggestion)} className="w-full">
