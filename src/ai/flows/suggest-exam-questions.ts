@@ -83,9 +83,14 @@ const prompt = ai.definePrompt({
   {
     "suggestions": [
       {
-        "title": "...",
-        "examPaper": "...",
-        "answerKey": "..."
+        "title": "Titre de l'examen de synthèse",
+        "examPaper": "## Épreuve de Synthèse\\n...",
+        "answerKey": "## Corrigé de l'Épreuve de Synthèse\\n..."
+      },
+      {
+        "title": "Titre de l'examen à remplir",
+        "examPaper": "## Examen à Remplir\\n...",
+        "answerKey": "## Corrigé de l'Examen à Remplir\\n..."
       }
     ]
   }
