@@ -24,7 +24,7 @@ const SuggestExamQuestionsInputSchema = z.object({
     .max(10)
     .default(5)
     .describe('The number of exam questions to generate (up to 10).'),
-  numberOfSuggestions: z.number().int().min(1).max(5).default(3).describe('The number of exam suggestions to generate.'),
+  numberOfSuggestions: z.number().int().min(1).max(5).default(2).describe('The number of exam suggestions to generate.'),
 });
 export type SuggestExamQuestionsInput = z.infer<
   typeof SuggestExamQuestionsInputSchema
@@ -57,18 +57,19 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestExamQuestionsOutputSchema},
   prompt: `You are an AI assistant designed to help French teachers in Algeria create complete exams based on the Algerian education system.
 
-  Generate {{numberOfSuggestions}} distinct exam suggestions.
-  Among these suggestions, ensure there is a mix of two types of exams:
-  1. Exams where students write answers on a separate paper.
-  2. Exams where students write answers directly on the exam paper (leave ample space for answers).
-  
+  Generate exactly 2 distinct exam suggestions.
+
+  The first suggestion should be a 'synthèse' (comprehensive composition) exam. This type of exam should be designed for students to write their answers on a separate paper. It should include a text for comprehension, followed by questions, grammar exercises, and a writing section ('production écrite').
+
+  The second suggestion should be an exam where students write their answers directly on the exam paper itself. This exam should be 2-3 pages long and must include ample empty space for answers after each question. It should also include tables for students to fill in.
+
   {{#if topic}}
   The suggestions should be on the topic of "{{topic}}".
   {{/if}}
   {{#if keywords}}
   The suggestions should incorporate the following keywords: "{{keywords}}".
   {{/if}}
-  
+
   Each suggestion should have a unique title and a complete exam paper with {{numberOfQuestions}} questions.
   The questions should align with the Algerian curriculum for the educational level: {{level}}, {{year}}, for the {{trimester}}.
 

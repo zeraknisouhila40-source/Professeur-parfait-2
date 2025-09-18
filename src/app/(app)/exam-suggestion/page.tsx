@@ -49,7 +49,7 @@ export default function ExamSuggestionPage() {
     setIsLoading(true);
     setExamSuggestions([]);
     try {
-      const result = await suggestExamQuestions({ ...data, numberOfSuggestions: 3 } as SuggestExamQuestionsInput);
+      const result = await suggestExamQuestions({ ...data, numberOfSuggestions: 2 } as SuggestExamQuestionsInput);
       setExamSuggestions(result.suggestions);
       toast({
         title: 'Succès !',
