@@ -70,6 +70,9 @@ const prompt = ai.definePrompt({
   Ensure the lesson plan is well-structured and aligned with the Algerian educational guidelines for teaching French.
 
   Output the lesson plan in a detailed, easy-to-understand format using Markdown.
+  Use bold and underlined titles for main sections (e.g., **__Objectifs__**).
+  Use appropriate spacing and line breaks to ensure readability.
+  Structure the plan logically with a clear hierarchy.
   `,
 });
 
