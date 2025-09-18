@@ -58,6 +58,10 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI assistant designed to help French teachers in Algeria create complete exams based on the Algerian education system.
 
   Generate {{numberOfSuggestions}} distinct exam suggestions.
+  Among these suggestions, ensure there is a mix of two types of exams:
+  1. Exams where students write answers on a separate paper.
+  2. Exams where students write answers directly on the exam paper (leave ample space for answers).
+  
   {{#if topic}}
   The suggestions should be on the topic of "{{topic}}".
   {{/if}}
