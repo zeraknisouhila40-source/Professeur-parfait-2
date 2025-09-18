@@ -18,8 +18,9 @@ import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Download } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PdfHeader } from '@/components/pdf-header';
+
 
 const formSchema = z.object({
   topic: z.string().optional(),
@@ -92,43 +93,49 @@ export default function ExamSuggestionPage() {
     try {
       const examPaperElement = document.getElementById(`exam-paper-${index}`);
       const answerKeyElement = document.getElementById(`answer-key-${index}`);
+      const headerElement = document.getElementById(`pdf-header-${index}`);
 
-      if (!examPaperElement || !answerKeyElement) {
+      if (!examPaperElement || !answerKeyElement || !headerElement) {
         toast({ title: 'Erreur', description: "Impossible de trouver le contenu de l'examen.", variant: 'destructive' });
+        setIsDownloading(false);
         return;
       }
 
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-
-      const addContentToPdf = async (element: HTMLElement, title: string) => {
+      
+      const addContentToPdf = async (element: HTMLElement, withHeader: boolean) => {
         const canvas = await html2canvas(element, { scale: 2 });
         const imgData = canvas.toDataURL('image/png');
         const imgProps = pdf.getImageProperties(imgData);
-        const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        
+        let imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
         let heightLeft = imgHeight;
         let position = 0;
 
-        pdf.addPage();
-        pdf.text(title, 14, 15);
-        
+        if (withHeader) {
+          const headerCanvas = await html2canvas(headerElement, { scale: 2 });
+          const headerImgData = headerCanvas.toDataURL('image/png');
+          const headerImgProps = pdf.getImageProperties(headerImgData);
+          const headerImgHeight = (headerImgProps.height * pdfWidth) / headerImgProps.width;
+          pdf.addImage(headerImgData, 'PNG', 0, 0, pdfWidth, headerImgHeight);
+          position = headerImgHeight;
+          heightLeft = imgHeight;
+        }
+
         while (heightLeft > 0) {
           pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-          heightLeft -= pdfHeight;
-          position -= pdfHeight;
+          heightLeft -= (pdfHeight - position); // Adjust for header on first page
           if (heightLeft > 0) {
             pdf.addPage();
+            position = -pdfHeight * (Math.floor(imgHeight / (pdfHeight-position)) -1) ;
           }
         }
       };
 
-      // Remove first blank page
-      pdf.deletePage(1);
-
-      await addContentToPdf(examPaperElement, 'Épreuve de l\'examen');
-      await addContentToPdf(answerKeyElement, 'Corrigé');
+      await addContentToPdf(examPaperElement, true);
+      pdf.addPage();
+      await addContentToPdf(answerKeyElement, false);
       
       pdf.save(`${suggestion.title.replace(/ /g, '_')}.pdf`);
       
@@ -300,6 +307,9 @@ export default function ExamSuggestionPage() {
                                       </div>
                                     </AccordionTrigger>
                                     <AccordionContent>
+                                        <div className="hidden">
+                                          <PdfHeader id={`pdf-header-${index}`} />
+                                        </div>
                                         <div className="space-y-4 pt-2">
                                             <Tabs defaultValue="exam-paper" className="w-full">
                                                 <TabsList className="grid w-full grid-cols-2">
@@ -344,3 +354,5 @@ export default function ExamSuggestionPage() {
     </div>
   );
 }
+
+    
