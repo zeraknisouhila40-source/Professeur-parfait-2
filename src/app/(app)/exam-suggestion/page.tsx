@@ -6,6 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { suggestExamQuestions, type SuggestExamQuestionsInput, type SuggestExamQuestionsOutput } from '@/ai/flows/suggest-exam-questions';
 import { marked } from 'marked';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Download } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -34,6 +36,7 @@ type ExamSuggestion = SuggestExamQuestionsOutput['suggestions'][0];
 export default function ExamSuggestionPage() {
   const [examSuggestions, setExamSuggestions] = useState<SuggestExamQuestionsOutput['suggestions']>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -77,14 +80,66 @@ export default function ExamSuggestionPage() {
 
   const getHtml = (markdown: string) => {
     try {
-        // Replace image placeholders with actual image tags if needed.
-        // For now, we rely on marked to handle markdown for images.
         return marked(markdown);
     } catch (e) {
         console.error("Error parsing markdown", e);
         return markdown;
     }
   }
+
+  const handleDownloadPdf = async (suggestion: ExamSuggestion, index: number) => {
+    setIsDownloading(true);
+    try {
+      const examPaperElement = document.getElementById(`exam-paper-${index}`);
+      const answerKeyElement = document.getElementById(`answer-key-${index}`);
+
+      if (!examPaperElement || !answerKeyElement) {
+        toast({ title: 'Erreur', description: "Impossible de trouver le contenu de l'examen.", variant: 'destructive' });
+        return;
+      }
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      const addContentToPdf = async (element: HTMLElement, title: string) => {
+        const canvas = await html2canvas(element, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addPage();
+        pdf.text(title, 14, 15);
+        
+        while (heightLeft > 0) {
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+          heightLeft -= pdfHeight;
+          position -= pdfHeight;
+          if (heightLeft > 0) {
+            pdf.addPage();
+          }
+        }
+      };
+
+      // Remove first blank page
+      pdf.deletePage(1);
+
+      await addContentToPdf(examPaperElement, 'Épreuve de l\'examen');
+      await addContentToPdf(answerKeyElement, 'Corrigé');
+      
+      pdf.save(`${suggestion.title.replace(/ /g, '_')}.pdf`);
+      
+      toast({ title: 'Téléchargement réussi', description: 'Le PDF de l\'examen a été téléchargé.' });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({ title: 'Erreur de téléchargement', description: 'Une erreur est survenue lors de la création du PDF.', variant: 'destructive' });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
 
   return (
@@ -252,15 +307,30 @@ export default function ExamSuggestionPage() {
                                                     <TabsTrigger value="answer-key">Corrigé</TabsTrigger>
                                                 </TabsList>
                                                 <TabsContent value="exam-paper">
-                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.examPaper) }} />
+                                                    <div id={`exam-paper-${index}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.examPaper) }} />
                                                 </TabsContent>
                                                 <TabsContent value="answer-key">
-                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.answerKey) }} />
+                                                    <div id={`answer-key-${index}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.answerKey) }} />
                                                 </TabsContent>
                                             </Tabs>
-                                            <Button onClick={() => applySuggestion(suggestion)} className="w-full">
-                                                Appliquer cette suggestion
-                                            </Button>
+                                            <div className="flex gap-2">
+                                              <Button onClick={() => applySuggestion(suggestion)} className="w-full">
+                                                  Appliquer cette suggestion
+                                              </Button>
+                                              <Button
+                                                variant="outline"
+                                                onClick={() => handleDownloadPdf(suggestion, index)}
+                                                disabled={isDownloading}
+                                                className="w-full"
+                                              >
+                                                {isDownloading ? (
+                                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                ) : (
+                                                  <Download className="mr-2 h-4 w-4" />
+                                                )}
+                                                Télécharger en PDF
+                                              </Button>
+                                            </div>
                                         </div>
                                     </AccordionContent>
                                 </AccordionItem>
