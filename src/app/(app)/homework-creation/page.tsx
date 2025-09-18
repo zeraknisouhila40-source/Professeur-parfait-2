@@ -13,7 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Printer, Copy } from 'lucide-react';
+import { PdfHeader } from '@/components/pdf-header';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: 'Le sujet doit contenir au moins 3 caractères.' }),
@@ -62,12 +63,45 @@ export default function HomeworkCreationPage() {
     }
   };
 
+  const handlePrint = () => {
+    const printContent = document.getElementById('homework-exercises');
+    if (printContent) {
+      const header = document.getElementById('pdf-header-print');
+      const headerHTML = header ? header.innerHTML : '';
+      const contentHTML = printContent.innerHTML;
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`<html><head><title>Imprimer les Devoirs</title>
+        <style>
+          body { font-family: 'PT Sans', sans-serif; }
+          ol { list-style-type: decimal; padding-left: 20px; }
+          li { margin-bottom: 10px; }
+        </style>
+        </head><body>${headerHTML}${contentHTML}</body></html>`);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }
+    }
+  };
+
+  const handleCopy = () => {
+    const textToCopy = generatedExercises.map((ex, index) => `${index + 1}. ${ex}`).join('\n');
+    navigator.clipboard.writeText(textToCopy);
+    toast({
+      title: 'Copié !',
+      description: "Les exercices ont été copiés dans le presse-papiers.",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Création de Devoirs"
         description="Générez des devoirs à la maison adaptés au niveau de vos élèves."
       />
+       <div className="hidden"><PdfHeader id="pdf-header-print" /></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
@@ -220,11 +254,17 @@ export default function HomeworkCreationPage() {
               )}
               {generatedExercises.length > 0 && (
                 <div className="space-y-4">
-                  <ol className="list-decimal list-outside space-y-3 pl-5">
-                    {generatedExercises.map((ex, index) => (
-                      <li key={index} className="bg-secondary/50 p-3 rounded-md pl-4">{ex}</li>
-                    ))}
-                  </ol>
+                  <div id="homework-exercises">
+                    <ol className="list-decimal list-outside space-y-3 pl-5">
+                      {generatedExercises.map((ex, index) => (
+                        <li key={index} className="bg-secondary/50 p-3 rounded-md pl-4">{ex}</li>
+                      ))}
+                    </ol>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Imprimer</Button>
+                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> Copier</Button>
+                  </div>
                 </div>
               )}
             </CardContent>

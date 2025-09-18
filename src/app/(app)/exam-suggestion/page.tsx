@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Download } from 'lucide-react';
+import { Loader2, Download, Printer, Copy } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PdfHeader } from '@/components/pdf-header';
@@ -71,14 +71,6 @@ export default function ExamSuggestionPage() {
     }
   };
 
-  const applySuggestion = (suggestion: ExamSuggestion) => {
-    console.log("Applying suggestion:", suggestion);
-    toast({
-      title: `Suggestion '${suggestion.title}' appliquée`,
-      description: "L'examen a été enregistré.",
-    });
-  };
-
   const getHtml = (markdown: string) => {
     try {
         return marked(markdown);
@@ -125,7 +117,7 @@ export default function ExamSuggestionPage() {
 
         while (heightLeft > 0) {
           pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-          heightLeft -= (pdfHeight - position); // Adjust for header on first page
+          heightLeft -= (pdfHeight - position);
           if (heightLeft > 0) {
             pdf.addPage();
             position = -pdfHeight * (Math.floor(imgHeight / (pdfHeight-position)) -1) ;
@@ -148,6 +140,39 @@ export default function ExamSuggestionPage() {
     }
   };
 
+  const handlePrint = (contentId: string) => {
+    const printContent = document.getElementById(contentId);
+    if (printContent) {
+      const header = document.getElementById('pdf-header-print');
+      const headerHTML = header ? header.innerHTML : '';
+      const contentHTML = printContent.innerHTML;
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`<html><head><title>Imprimer</title>
+        <style>
+          body { font-family: 'PT Sans', sans-serif; }
+          .prose { max-width: 100%; } 
+          img { max-width: 100%; height: auto; }
+          table { width: 100%; border-collapse: collapse; } 
+          th, td { border: 1px solid #ccc; padding: 8px; }
+        </style>
+        </head><body>${headerHTML}${contentHTML}</body></html>`);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }
+    }
+  };
+
+  const handleCopy = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast({
+      title: 'Copié !',
+      description: "Le contenu de l'examen a été copié dans le presse-papiers.",
+    });
+  };
+
 
   return (
     <div className="space-y-6">
@@ -155,6 +180,7 @@ export default function ExamSuggestionPage() {
         title="Suggestion d'Examen"
         description="Générez des examens complets sur mesure en quelques secondes."
       />
+      <div className="hidden"><PdfHeader id="pdf-header-print" /></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
             <Card className="sticky top-20">
@@ -318,15 +344,20 @@ export default function ExamSuggestionPage() {
                                                 </TabsList>
                                                 <TabsContent value="exam-paper">
                                                     <div id={`exam-paper-${index}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.examPaper) }} />
+                                                    <div className="flex gap-2 mt-2">
+                                                        <Button variant="outline" size="sm" onClick={() => handlePrint(`exam-paper-${index}`)}><Printer className="mr-2 h-4 w-4" /> Imprimer</Button>
+                                                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.examPaper)}><Copy className="mr-2 h-4 w-4" /> Copier</Button>
+                                                    </div>
                                                 </TabsContent>
                                                 <TabsContent value="answer-key">
                                                     <div id={`answer-key-${index}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.answerKey) }} />
+                                                     <div className="flex gap-2 mt-2">
+                                                        <Button variant="outline" size="sm" onClick={() => handlePrint(`answer-key-${index}`)}><Printer className="mr-2 h-4 w-4" /> Imprimer</Button>
+                                                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.answerKey)}><Copy className="mr-2 h-4 w-4" /> Copier</Button>
+                                                    </div>
                                                 </TabsContent>
                                             </Tabs>
-                                            <div className="flex gap-2">
-                                              <Button onClick={() => applySuggestion(suggestion)} className="w-full">
-                                                  Appliquer cette suggestion
-                                              </Button>
+                                            <div className="flex gap-2 mt-4">
                                               <Button
                                                 variant="outline"
                                                 onClick={() => handleDownloadPdf(suggestion, index)}
@@ -338,7 +369,7 @@ export default function ExamSuggestionPage() {
                                                 ) : (
                                                   <Download className="mr-2 h-4 w-4" />
                                                 )}
-                                                Télécharger en PDF
+                                                Télécharger le Sujet & Corrigé en PDF
                                               </Button>
                                             </div>
                                         </div>
@@ -354,5 +385,3 @@ export default function ExamSuggestionPage() {
     </div>
   );
 }
-
-    

@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Download } from 'lucide-react';
+import { Loader2, Download, Printer, Copy } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PdfHeader } from '@/components/pdf-header';
 
@@ -119,7 +119,6 @@ export default function LessonPlanningPage() {
         while (heightLeft > 0) {
             pdf.addPage();
             page++;
-            // The y position needs to be negative to start from the correct part of the image
             const yPos = -(pdfHeight * (page-1)) + position;
             pdf.addImage(imgData, 'PNG', 0, yPos, pdfWidth, imgHeight);
             heightLeft -= pdfHeight;
@@ -135,6 +134,38 @@ export default function LessonPlanningPage() {
       toast({ title: 'Erreur de téléchargement', description: 'Une erreur est survenue lors de la création du PDF.', variant: 'destructive' });
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handlePrint = () => {
+    const printContent = document.getElementById('lesson-plan');
+    if (printContent) {
+      const header = document.getElementById('pdf-header-lesson');
+      const headerHTML = header ? header.innerHTML : '';
+      const contentHTML = printContent.innerHTML;
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`<html><head><title>Imprimer le Plan de Leçon</title>
+        <style>
+          body { font-family: 'PT Sans', sans-serif; }
+          .prose { max-width: 100%; }
+        </style>
+        </head><body>${headerHTML}${contentHTML}</body></html>`);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }
+    }
+  };
+
+  const handleCopy = () => {
+    if (lessonPlan) {
+      navigator.clipboard.writeText(lessonPlan);
+      toast({
+        title: 'Copié !',
+        description: "Le plan de leçon a été copié dans le presse-papiers.",
+      });
     }
   };
 
@@ -292,18 +323,21 @@ export default function LessonPlanningPage() {
               {lessonPlan && (
                 <div className="space-y-4">
                   <div id="lesson-plan" className="prose prose-sm max-w-none dark:prose-invert bg-secondary/50 p-4 rounded-md border" dangerouslySetInnerHTML={{ __html: getHtml(lessonPlan) }} />
-                  <Button
-                    onClick={handleDownloadPdf}
-                    disabled={isDownloading}
-                    className="w-full"
-                  >
-                    {isDownloading ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Download className="mr-2 h-4 w-4" />
-                    )}
-                    Télécharger en PDF
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      onClick={handleDownloadPdf}
+                      disabled={isDownloading}
+                    >
+                      {isDownloading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Download className="mr-2 h-4 w-4" />
+                      )}
+                      Télécharger en PDF
+                    </Button>
+                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Imprimer</Button>
+                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> Copier</Button>
+                  </div>
                 </div>
               )}
             </CardContent>
