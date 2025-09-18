@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { aiAssistedLessonPlanning, type AiAssistedLessonPlanningInput } from '@/ai/flows/ai-assisted-lesson-planning';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { marked } from 'marked';
 
 import { Button } from '@/components/ui/button';
@@ -81,6 +80,7 @@ export default function LessonPlanningPage() {
   const handleDownloadPdf = async () => {
     if (!lessonPlan) return;
     setIsDownloading(true);
+
     try {
       const lessonPlanElement = document.getElementById('lesson-plan');
       const headerElement = document.getElementById('pdf-header-lesson');
@@ -90,39 +90,30 @@ export default function LessonPlanningPage() {
         setIsDownloading(false);
         return;
       }
+      
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      
+      const headerHtml = headerElement.outerHTML;
+      const lessonPlanHtml = lessonPlanElement.outerHTML;
+      
+      const combinedHtml = `
+        <div style="font-family: 'PT Sans', sans-serif; color: black;">
+          ${headerHtml}
+          ${lessonPlanHtml}
+        </div>
+      `;
 
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      // Add header
-      const headerCanvas = await html2canvas(headerElement, { scale: 2 });
-      const headerImgData = headerCanvas.toDataURL('image/png');
-      const headerImgProps = pdf.getImageProperties(headerImgData);
-      const headerImgHeight = (headerImgProps.height * pdfWidth) / headerImgProps.width;
-      
-      // Add content
-      const contentCanvas = await html2canvas(lessonPlanElement, { scale: 2 });
-      const contentImgData = contentCanvas.toDataURL('image/png');
-      const contentImgProps = pdf.getImageProperties(contentImgData);
-      let contentImgHeight = (contentImgProps.height * pdfWidth) / contentImgProps.width;
-      
-      let heightLeft = contentImgHeight;
-      let position = headerImgHeight;
+      await pdf.html(combinedHtml, {
+        callback: function (doc) {
+          doc.save(`Plan_de_leçon_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
+        },
+        x: 15,
+        y: 15,
+        width: 565, // A4 width in points (595) minus margins
+        windowWidth: 1000, // virtual window width
+        autoPaging: 'text',
+      });
 
-      pdf.addImage(headerImgData, 'PNG', 0, 0, pdfWidth, headerImgHeight);
-      pdf.addImage(contentImgData, 'PNG', 0, position, pdfWidth, contentImgHeight);
-      heightLeft -= (pdfHeight - position);
-
-      while (heightLeft > 0) {
-        position = heightLeft - contentImgHeight;
-        pdf.addPage();
-        pdf.addImage(contentImgData, 'PNG', 0, position, pdfWidth, contentImgHeight);
-        heightLeft -= pdfHeight;
-      }
-      
-      pdf.save(`Plan_de_leçon_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
-      
       toast({ title: 'Téléchargement réussi', description: 'Le PDF du plan de leçon a été téléchargé.' });
     } catch (error) {
       console.error('Error generating PDF:', error);
