@@ -14,11 +14,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const formSchema = z.object({
   topic: z.string().min(3, { message: 'Le sujet doit contenir au moins 3 caractères.' }),
   numberOfClassMeetings: z.coerce.number().int().min(1, { message: 'Doit être au moins 1.' }).max(20, { message: 'Ne peut pas dépasser 20.' }),
   prerequisiteKnowledge: z.string().min(10, { message: 'Les prérequis doivent contenir au moins 10 caractères.' }),
+  level: z.string({ required_error: 'Veuillez sélectionner un niveau.' }),
+  year: z.string({ required_error: 'Veuillez sélectionner une année.' }),
+  trimester: z.string({ required_error: 'Veuillez sélectionner un trimestre.' }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -87,6 +91,72 @@ export default function LessonPlanningPage() {
                         <FormMessage />
                       </FormItem>
                     )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="level"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Niveau</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Choisir le niveau" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              <SelectItem value="Enseignement moyen">Enseignement moyen</SelectItem>
+                              <SelectItem value="Enseignement secondaire">Enseignement secondaire</SelectItem>
+                              </SelectContent>
+                          </Select>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="year"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Année</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Choisir l'année" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                  <SelectItem value="1ère année">1ère année</SelectItem>
+                                  <SelectItem value="2ème année">2ème année</SelectItem>
+                                  <SelectItem value="3ème année">3ème année</SelectItem>
+                                  <SelectItem value="4ème année">4ème année (pour le moyen)</SelectItem>
+                              </SelectContent>
+                          </Select>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="trimester"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Trimestre</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Choisir le trimestre" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              <SelectItem value="1er trimestre">1er trimestre</SelectItem>
+                              <SelectItem value="2ème trimestre">2ème trimestre</SelectItem>
+                              <SelectItem value="3ème trimestre">3ème trimestre</SelectItem>
+                              </SelectContent>
+                          </Select>
+                          <FormMessage />
+                          </FormItem>
+                      )}
                   />
                   <FormField
                     control={form.control}

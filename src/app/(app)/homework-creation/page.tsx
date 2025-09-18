@@ -18,7 +18,9 @@ import { Loader2 } from 'lucide-react';
 const formSchema = z.object({
   topic: z.string().min(3, { message: 'Le sujet doit contenir au moins 3 caractères.' }),
   skillLevel: z.enum(['beginner', 'intermediate', 'advanced']),
-  educationalStage: z.enum(['primary', 'middle', 'secondary']),
+  level: z.string({ required_error: 'Veuillez sélectionner un niveau.' }),
+  year: z.string({ required_error: 'Veuillez sélectionner une année.' }),
+  trimester: z.string({ required_error: 'Veuillez sélectionner un trimestre.' }),
   quantity: z.coerce.number().int().min(1, { message: 'Doit être au moins 1.' }).max(10, { message: 'Ne peut pas dépasser 10.' }),
 });
 
@@ -34,7 +36,6 @@ export default function HomeworkCreationPage() {
     defaultValues: {
       topic: '',
       skillLevel: 'intermediate',
-      educationalStage: 'secondary',
       quantity: 3,
     },
   });
@@ -90,6 +91,72 @@ export default function HomeworkCreationPage() {
                       </FormItem>
                     )}
                   />
+                   <FormField
+                      control={form.control}
+                      name="level"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Niveau</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Choisir le niveau" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              <SelectItem value="Enseignement moyen">Enseignement moyen</SelectItem>
+                              <SelectItem value="Enseignement secondaire">Enseignement secondaire</SelectItem>
+                              </SelectContent>
+                          </Select>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="year"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Année</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Choisir l'année" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                  <SelectItem value="1ère année">1ère année</SelectItem>
+                                  <SelectItem value="2ème année">2ème année</SelectItem>
+                                  <SelectItem value="3ème année">3ème année</SelectItem>
+                                  <SelectItem value="4ème année">4ème année (pour le moyen)</SelectItem>
+                              </SelectContent>
+                          </Select>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="trimester"
+                      render={({ field }) => (
+                          <FormItem>
+                          <FormLabel>Trimestre</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                              <SelectTrigger>
+                                  <SelectValue placeholder="Choisir le trimestre" />
+                              </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                              <SelectItem value="1er trimestre">1er trimestre</SelectItem>
+                              <SelectItem value="2ème trimestre">2ème trimestre</SelectItem>
+                              <SelectItem value="3ème trimestre">3ème trimestre</SelectItem>
+                              </SelectContent>
+                          </Select>
+                          <FormMessage />
+                          </FormItem>
+                      )}
+                  />
                   <FormField
                     control={form.control}
                     name="skillLevel"
@@ -106,28 +173,6 @@ export default function HomeworkCreationPage() {
                             <SelectItem value="beginner">Débutant</SelectItem>
                             <SelectItem value="intermediate">Intermédiaire</SelectItem>
                             <SelectItem value="advanced">Avancé</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="educationalStage"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Niveau Éducatif</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Choisir une étape" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="primary">Primaire</SelectItem>
-                            <SelectItem value="middle">Collège</SelectItem>
-                            <SelectItem value="secondary">Lycée</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

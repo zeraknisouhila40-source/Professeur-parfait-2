@@ -17,8 +17,9 @@ const GenerateHomeworkExercisesInputSchema = z.object({
   skillLevel: z
     .enum(['beginner', 'intermediate', 'advanced'])
     .describe('The skill level of the students for whom the homework is intended.'),
-  educationalStage:
-    z.enum(['primary', 'middle', 'secondary']).describe('The educational stage for the homework exercises.'),
+  level: z.string().describe("The educational level (e.g., 'middle', 'secondary')."),
+  year: z.string().describe("The year within the educational level (e.g., '1st year')."),
+  trimester: z.string().describe("The trimester (e.g., '1st trimester')."),
   quantity: z.number().min(1).max(10).default(3).describe('The desired number of homework exercises.'),
   curriculumGuidelines: z
     .string()
@@ -43,7 +44,8 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI assistant designed to help French teachers in Algeria create homework exercises according to the Algerian education system.
 
   Generate {{quantity}} homework exercises for the topic: {{topic}}.
-  The exercises should be appropriate for students with a {{skillLevel}} skill level and at the {{educationalStage}} educational stage.
+  The exercises should be appropriate for students at the {{level}} level, in their {{year}}, during the {{trimester}}.
+  The exercises should be appropriate for students with a {{skillLevel}} skill level.
   Align the exercises with the following curriculum guidelines: {{curriculumGuidelines}}.
 
   Ensure that each exercise is clear, concise, and directly related to the specified topic and skill level.

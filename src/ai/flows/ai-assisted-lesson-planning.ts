@@ -24,6 +24,9 @@ const AiAssistedLessonPlanningInputSchema = z.object({
     .describe(
       "The students' existing knowledge and skills related to the topic."
     ),
+  level: z.string().describe("The educational level (e.g., 'middle', 'secondary')."),
+  year: z.string().describe("The year within the educational level (e.g., '1st year')."),
+  trimester: z.string().describe("The trimester (e.g., '1st trimester')."),
 });
 export type AiAssistedLessonPlanningInput = z.infer<
   typeof AiAssistedLessonPlanningInputSchema
@@ -55,6 +58,9 @@ const prompt = ai.definePrompt({
   Based on the topic, number of class meetings, and prerequisite knowledge provided, generate a comprehensive lesson plan that includes clear objectives, engaging activities, and appropriate assessments.
 
   Topic: {{{topic}}}
+  Level: {{{level}}}
+  Year: {{{year}}}
+  Trimester: {{{trimester}}}
   Number of Class Meetings: {{{numberOfClassMeetings}}}
   Prerequisite Knowledge: {{{prerequisiteKnowledge}}}
 
