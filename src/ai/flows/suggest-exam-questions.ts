@@ -32,7 +32,7 @@ export type SuggestExamQuestionsInput = z.infer<
 
 const ExamSuggestionSchema = z.object({
   title: z.string().describe('A title for this exam suggestion.'),
-  examPaper: z.string().describe('The complete exam paper, including questions, scoring tables, and image placeholders if necessary. Use Markdown for formatting.'),
+  examPaper: z.string().describe("The complete exam paper, including questions, scoring tables, and image placeholders if necessary. Use Markdown for formatting. For images, use ![Image description](https://picsum.photos/seed/1/600/400) and change the seed for different images."),
   answerKey: z.string().describe('The corresponding answer key for the exam paper, formatted for the teacher. Use Markdown for formatting.'),
 });
 
@@ -69,7 +69,7 @@ const prompt = ai.definePrompt({
   The questions should align with the Algerian curriculum for the educational level: {{level}}, {{year}}, for the {{trimester}}.
 
   For each suggestion, provide two parts:
-  1.  **examPaper**: The full exam paper, ready to be given to students. It should be well-formatted using Markdown. Include tables for scoring points for each exercise. If an image is relevant, use a Markdown placeholder like '![Description for image]'.
+  1.  **examPaper**: The full exam paper, ready to be given to students. It should be well-formatted using Markdown. Include tables for scoring points for each exercise. If an image is relevant, use a Markdown placeholder like '![Image description](https://picsum.photos/seed/1/600/400)'. Use a different seed for each image.
   2.  **answerKey**: A separate, complete answer key for the teacher, also formatted in Markdown.
 
   Ensure that the content is relevant, comprehensive, and appropriate for the specified educational level.

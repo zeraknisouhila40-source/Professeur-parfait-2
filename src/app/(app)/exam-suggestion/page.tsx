@@ -5,6 +5,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { suggestExamQuestions, type SuggestExamQuestionsInput, type SuggestExamQuestionsOutput } from '@/ai/flows/suggest-exam-questions';
+import { marked } from 'marked';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -73,6 +74,18 @@ export default function ExamSuggestionPage() {
       description: "L'examen a été enregistré.",
     });
   };
+
+  const getHtml = (markdown: string) => {
+    try {
+        // Replace image placeholders with actual image tags if needed.
+        // For now, we rely on marked to handle markdown for images.
+        return marked(markdown);
+    } catch (e) {
+        console.error("Error parsing markdown", e);
+        return markdown;
+    }
+  }
+
 
   return (
     <div className="space-y-6">
@@ -239,10 +252,10 @@ export default function ExamSuggestionPage() {
                                                     <TabsTrigger value="answer-key">Corrigé</TabsTrigger>
                                                 </TabsList>
                                                 <TabsContent value="exam-paper">
-                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: suggestion.examPaper.replace(/\\n/g, '<br />') }} />
+                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.examPaper) }} />
                                                 </TabsContent>
                                                 <TabsContent value="answer-key">
-                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: suggestion.answerKey.replace(/\\n/g, '<br />') }} />
+                                                    <div className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.answerKey) }} />
                                                 </TabsContent>
                                             </Tabs>
                                             <Button onClick={() => applySuggestion(suggestion)} className="w-full">
