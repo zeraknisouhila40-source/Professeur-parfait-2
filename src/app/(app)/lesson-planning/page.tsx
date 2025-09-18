@@ -96,13 +96,7 @@ export default function LessonPlanningPage() {
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
       const addContentToPdf = async (element: HTMLElement, withHeader: boolean) => {
-        const canvas = await html2canvas(element, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
-        const imgProps = pdf.getImageProperties(imgData);
-        let imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        let heightLeft = imgHeight;
         let position = 0;
-
         if (withHeader) {
           const headerCanvas = await html2canvas(headerElement, { scale: 2 });
           const headerImgData = headerCanvas.toDataURL('image/png');
@@ -110,16 +104,24 @@ export default function LessonPlanningPage() {
           const headerImgHeight = (headerImgProps.height * pdfWidth) / headerImgProps.width;
           pdf.addImage(headerImgData, 'PNG', 0, 0, pdfWidth, headerImgHeight);
           position = headerImgHeight;
-          heightLeft = imgHeight;
         }
 
+        const canvas = await html2canvas(element, { scale: 2, windowWidth: element.scrollWidth, windowHeight: element.scrollHeight });
+        const imgData = canvas.toDataURL('image/png');
+        const imgProps = pdf.getImageProperties(imgData);
+        let imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        let heightLeft = imgHeight;
+        
         pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
         heightLeft -= (pdfHeight - position);
 
+        let page = 1;
         while (heightLeft > 0) {
             pdf.addPage();
-            position = -pdfHeight * (Math.floor(imgHeight / (pdfHeight-position)) -1) ;
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            page++;
+            // The y position needs to be negative to start from the correct part of the image
+            const yPos = -(pdfHeight * (page-1)) + position;
+            pdf.addImage(imgData, 'PNG', 0, yPos, pdfWidth, imgHeight);
             heightLeft -= pdfHeight;
         }
       };
