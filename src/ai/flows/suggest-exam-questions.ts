@@ -26,15 +26,24 @@ const SuggestExamQuestionsInputSchema = z.object({
     .max(10)
     .default(5)    
     .describe('The number of exam questions to generate (up to 10).'),
+  educationalLevel: z.string().describe('The educational level (e.g., middle school, 3rd year, 2nd trimester).'),
+  numberOfSuggestions: z.number().int().min(1).max(5).default(3).describe('The number of exam suggestions to generate.'),
 });
 export type SuggestExamQuestionsInput = z.infer<
   typeof SuggestExamQuestionsInputSchema
 >;
 
-const SuggestExamQuestionsOutputSchema = z.object({
+const ExamSuggestionSchema = z.object({
+  title: z.string().describe('A title for this exam suggestion.'),
   questions: z
     .array(z.string())
     .describe('An array of suggested exam questions.'),
+});
+
+const SuggestExamQuestionsOutputSchema = z.object({
+  suggestions: z
+    .array(ExamSuggestionSchema)
+    .describe('An array of distinct exam suggestions, each with a title and a list of questions.'),
 });
 export type SuggestExamQuestionsOutput = z.infer<
   typeof SuggestExamQuestionsOutputSchema
@@ -52,11 +61,13 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestExamQuestionsOutputSchema},
   prompt: `You are an AI assistant designed to help French teachers in Algeria create exams.
 
-  Generate {{numberOfQuestions}} exam questions on the topic of "{{topic}}". The difficulty level should be {{difficulty}}, and the questions should align with the following Algerian curriculum standards: {{curriculumAlignment}}.
+  Generate {{numberOfSuggestions}} distinct exam suggestions on the topic of "{{topic}}". 
+  Each suggestion should have a unique title and {{numberOfQuestions}} questions.
+  The difficulty level should be {{difficulty}}, and the questions should align with the following Algerian curriculum standards: {{curriculumAlignment}} for the educational level: {{educationalLevel}}.
 
   Ensure that the questions are relevant, comprehensive, and appropriate for the specified difficulty level and curriculum.
 
-  Please provide the questions in a numbered list.
+  Please provide the suggestions with titles and numbered lists of questions.
   `,
 });
 
