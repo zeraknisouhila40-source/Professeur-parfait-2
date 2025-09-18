@@ -113,13 +113,14 @@ export default function LessonPlanningPage() {
           heightLeft = imgHeight;
         }
 
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= (pdfHeight - position);
+
         while (heightLeft > 0) {
-          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-          heightLeft -= (pdfHeight - position);
-          if (heightLeft > 0) {
             pdf.addPage();
             position = -pdfHeight * (Math.floor(imgHeight / (pdfHeight-position)) -1) ;
-          }
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
         }
       };
 
@@ -199,7 +200,7 @@ export default function LessonPlanningPage() {
                               <FormControl>
                               <SelectTrigger>
                                   <SelectValue placeholder="Choisir l'année" />
-                              </Trigger>
+                              </SelectTrigger>
                               </FormControl>
                               <SelectContent>
                                   <SelectItem value="1ère année">1ère année</SelectItem>
