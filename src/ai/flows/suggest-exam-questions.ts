@@ -12,21 +12,18 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const SuggestExamQuestionsInputSchema = z.object({
-  topic: z.string().describe('The topic for which to generate exam questions.'),
-  difficulty: z
-    .enum(['easy', 'medium', 'hard'])
-    .describe('The difficulty level of the exam questions.'),
-  curriculumAlignment: z
-    .string()
-    .describe('The specific Algerian curriculum standards to align with.'),
+  topic: z.string().optional().describe('The topic for which to generate exam questions.'),
+  keywords: z.string().optional().describe('Keywords to refine the exam questions.'),
+  level: z.string().describe("The educational level (e.g., 'middle', 'secondary')."),
+  year: z.string().describe("The year within the educational level (e.g., '1st year')."),
+  trimester: z.string().describe("The trimester (e.g., '1st trimester')."),
   numberOfQuestions: z
     .number()
     .int()
     .min(1)
     .max(10)
-    .default(5)    
+    .default(5)
     .describe('The number of exam questions to generate (up to 10).'),
-  educationalLevel: z.string().describe('The educational level (e.g., middle school, 3rd year, 2nd trimester).'),
   numberOfSuggestions: z.number().int().min(1).max(5).default(3).describe('The number of exam suggestions to generate.'),
 });
 export type SuggestExamQuestionsInput = z.infer<
@@ -61,11 +58,18 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestExamQuestionsOutputSchema},
   prompt: `You are an AI assistant designed to help French teachers in Algeria create exams.
 
-  Generate {{numberOfSuggestions}} distinct exam suggestions on the topic of "{{topic}}". 
+  Generate {{numberOfSuggestions}} distinct exam suggestions.
+  {{#if topic}}
+  The suggestions should be on the topic of "{{topic}}".
+  {{/if}}
+  {{#if keywords}}
+  The suggestions should incorporate the following keywords: "{{keywords}}".
+  {{/if}}
+  
   Each suggestion should have a unique title and {{numberOfQuestions}} questions.
-  The difficulty level should be {{difficulty}}, and the questions should align with the following Algerian curriculum standards: {{curriculumAlignment}} for the educational level: {{educationalLevel}}.
+  The questions should align with the Algerian curriculum for the educational level: {{level}}, {{year}}, for the {{trimester}}.
 
-  Ensure that the questions are relevant, comprehensive, and appropriate for the specified difficulty level and curriculum.
+  Ensure that the questions are relevant, comprehensive, and appropriate for the specified educational level.
 
   Please provide the suggestions with titles and numbered lists of questions.
   `,
