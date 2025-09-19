@@ -32,44 +32,58 @@ const prompt = ai.definePrompt({
   prompt: `{{#if isFrench}}
 Vous êtes un enseignant expert en langue française, spécialisé dans l'identification des erreurs courantes et la suggestion de corrections dans les devoirs des élèves, conformément au système éducatif algérien.
 
-Vous utiliserez ces informations pour corriger le devoir de l'élève, identifier les erreurs courantes et suggérer des améliorations.
+Votre tâche est de corriger le devoir de l'élève, d'identifier les erreurs courantes et de suggérer des améliorations, en vous basant sur les informations fournies.
 
-Niveau d'éducation : {{{level}}}
-Sujet : {{{topic}}}
-Questions de l'examen : {{{examQuestions}}}
+**Contexte Éducatif :**
+*   **Langue :** Français
+*   **Niveau :** {{level}}
+{{#if topic}}
+*   **Sujet :** {{{topic}}}
+{{/if}}
+{{#if examQuestions}}
+*   **Questions de l'examen :** {{{examQuestions}}}
+{{/if}}
 
+**Devoir de l'élève :**
 {{#if studentAssignmentImage}}
-Devoir de l'élève (Image) :
+L'élève a fourni une image de son devoir.
 {{media url=studentAssignmentImage}}
 {{else}}
-Devoir de l'élève (Texte) :
 {{{studentAssignment}}}
 {{/if}}
 
-Devoir corrigé :
-Erreurs identifiées :
-Améliorations suggérées :
+**Instructions pour la sortie :**
+1.  **Devoir corrigé :** Fournissez une version corrigée du devoir de l'élève.
+2.  **Erreurs identifiées :** Listez les erreurs clés trouvées dans le devoir (grammaire, orthographe, etc.).
+3.  **Améliorations suggérées :** Proposez des conseils constructifs pour aider l'élève à s'améliorer.
 
 {{else}}
 You are an expert English teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.
 
-You will use this information to correct the student's assignment, identify common errors, and suggest improvements.
+Your task is to correct the student's assignment, identify common errors, and suggest improvements based on the provided information.
 
-Educational Level: {{{level}}}
-Topic: {{{topic}}}
-Exam Questions: {{{examQuestions}}}
+**Educational Context:**
+*   **Language:** English
+*   **Level:** {{{level}}}
+{{#if topic}}
+*   **Topic:** {{{topic}}}
+{{/if}}
+{{#if examQuestions}}
+*   **Exam Questions:** {{{examQuestions}}}
+{{/if}}
 
+**Student's Assignment:**
 {{#if studentAssignmentImage}}
-Student Assignment (Image):
+The student has provided an image of their assignment.
 {{media url=studentAssignmentImage}}
 {{else}}
-Student Assignment (Text):
 {{{studentAssignment}}}
 {{/if}}
 
-Corrected Assignment:
-Identified Errors:
-Suggested Improvements:
+**Output Instructions:**
+1.  **Corrected Assignment:** Provide a corrected version of the student's assignment.
+2.  **Identified Errors:** List the key errors found in the assignment (grammar, spelling, etc.).
+3.  **Suggested Improvements:** Offer constructive tips to help the student improve.
 {{/if}}`,
 });
 
@@ -81,7 +95,7 @@ const correctAssignmentFlow = ai.defineFlow(
   },
   async (input) => {
     const isFrench = input.language === 'fr';
-    const {output} = await prompt(input, {isFrench});
+    const {output} = await prompt({...input, isFrench});
     return output!;
   }
 );

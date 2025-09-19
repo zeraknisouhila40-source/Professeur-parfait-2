@@ -83,7 +83,7 @@ const suggestExamQuestionsFlow = ai.defineFlow(
   async (input) => {
     const isFrench = input.language === 'fr';
     const creativitySeed = Math.random();
-    const {output} = await prompt(input, {isFrench, creativitySeed});
+    const {output} = await prompt({...input, isFrench, creativitySeed});
     return output!;
   }
 );
