@@ -51,6 +51,7 @@ export async function correctAssignment(input: CorrectAssignmentInput): Promise<
 
 const prompt = ai.definePrompt({
   name: 'correctAssignmentPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: FlowInputSchema},
   output: {schema: CorrectAssignmentOutputSchema},
   prompt: `You are an expert {{#if isFrench}}French{{else}}English{{/if}} teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.

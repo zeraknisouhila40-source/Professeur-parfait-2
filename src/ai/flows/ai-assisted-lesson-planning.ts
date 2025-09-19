@@ -60,6 +60,7 @@ export async function aiAssistedLessonPlanning(
 
 const prompt = ai.definePrompt({
   name: 'aiAssistedLessonPlanningPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: FlowInputSchema},
   output: {schema: AiAssistedLessonPlanningOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create effective lesson plans based on the Algerian education system.

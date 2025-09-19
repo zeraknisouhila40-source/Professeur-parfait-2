@@ -61,6 +61,7 @@ export async function suggestExamQuestions(
 
 const prompt = ai.definePrompt({
   name: 'suggestExamQuestionsPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: FlowInputSchema},
   output: {schema: SuggestExamQuestionsOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create complete exams based on the Algerian education system.

@@ -47,6 +47,7 @@ export async function generateHomeworkExercises(input: GenerateHomeworkExercises
 
 const prompt = ai.definePrompt({
   name: 'generateHomeworkExercisesPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: FlowInputSchema},
   output: {schema: GenerateHomeworkExercisesOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create homework exercises according to the Algerian education system.
