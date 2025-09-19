@@ -33,25 +33,30 @@ const prompt = ai.definePrompt({
     }),
   },
   output: {schema: AiAssistedLessonPlanningOutputSchema},
-  prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create effective lesson plans based on the Algerian education system.
+  prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create high-quality, professional lesson plans that strictly adhere to the Algerian education system.
 
-  Based on the topic, number of class meetings, and prerequisite knowledge provided, generate a comprehensive lesson plan that includes clear objectives, engaging activities, and appropriate assessments.
+Your task is to generate a comprehensive and detailed lesson plan based on the provided information. The plan must be well-structured, pedagogically sound, and ready for classroom implementation.
 
-  Topic: {{{topic}}}
-  Level: {{{level}}}
-  Year: {{{year}}}
-  Trimester: {{{trimester}}}
-  Number of Class Meetings: {{{numberOfClassMeetings}}}
-  {{#if prerequisiteKnowledge}}
-  Prerequisite Knowledge: {{{prerequisiteKnowledge}}}
-  {{/if}}
+**Educational Context:**
+*   **Language:** {{#if isFrench}}French{{else}}English{{/if}}
+*   **Level:** {{level}}
+*   **Year:** {{year}}
+*   **Trimester:** {{trimester}}
+*   **Topic:** {{{topic}}}
+*   **Number of Class Meetings:** {{{numberOfClassMeetings}}}
+{{#if prerequisiteKnowledge}}
+*   **Prerequisite Knowledge:** {{{prerequisiteKnowledge}}}
+{{/if}}
 
-  Ensure the lesson plan is well-structured and aligned with the Algerian educational guidelines for teaching {{#if isFrench}}French{{else}}English{{/if}}.
+**Crucial Instructions:**
+1.  **Strictly Adhere to the Algerian Curriculum:** All content, objectives, activities, and assessments must align with the official pedagogical program for the specified level, year, and trimester.
+2.  **Generate a Comprehensive Plan:** The lesson plan must include clear objectives, engaging student-centered activities, necessary materials, and appropriate assessment methods.
+3.  **Professional Formatting:**
+    *   Use Markdown for clean and professional formatting.
+    *   Use bold and underlined titles for main sections (e.g., **__Objectives__**, **__Activities__**).
+    *   Ensure logical structure, proper spacing, and a clear hierarchy for easy readability and direct use.
 
-  Output the lesson plan in a detailed, easy-to-understand format using Markdown.
-  Use bold and underlined titles for main sections (e.g., **__Objectives__**).
-  Use appropriate spacing and line breaks to ensure readability.
-  Structure the plan logically with a clear hierarchy.
+The final output must be a single, detailed lesson plan in Markdown format.
   `,
 });
 
