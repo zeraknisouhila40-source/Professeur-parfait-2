@@ -35,14 +35,15 @@ const GenerateHomeworkExercisesOutputSchema = z.object({
 export type GenerateHomeworkExercisesOutput = z.infer<typeof GenerateHomeworkExercisesOutputSchema>;
 
 export async function generateHomeworkExercises(input: GenerateHomeworkExercisesInput): Promise<GenerateHomeworkExercisesOutput> {
-  return generateHomeworkExercisesFlow(input);
+  const isFrench = input.language === 'fr';
+  return generateHomeworkExercisesFlow({...input, isFrench} as any);
 }
 
 const prompt = ai.definePrompt({
   name: 'generateHomeworkExercisesPrompt',
-  input: {schema: GenerateHomeworkExercisesInputSchema},
+  input: {schema: GenerateHomeworkExercisesInputSchema.extend({ isFrench: z.boolean().optional() })},
   output: {schema: GenerateHomeworkExercisesOutputSchema},
-  prompt: `You are an AI assistant designed to help {{#if language 'fr'}}French{{else}}English{{/if}} teachers in Algeria create homework exercises according to the Algerian education system.
+  prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create homework exercises according to the Algerian education system.
 
   Generate {{quantity}} homework exercises for the topic: {{topic}}.
   The exercises should be appropriate for students at the {{level}} level, in their {{year}}, during the {{trimester}}.
@@ -60,7 +61,7 @@ const prompt = ai.definePrompt({
 const generateHomeworkExercisesFlow = ai.defineFlow(
   {
     name: 'generateHomeworkExercisesFlow',
-    inputSchema: GenerateHomeworkExercisesInputSchema,
+    inputSchema: GenerateHomeworkExercisesInputSchema.extend({ isFrench: z.boolean().optional() }),
     outputSchema: GenerateHomeworkExercisesOutputSchema,
   },
   async input => {
