@@ -1,6 +1,7 @@
+
 {
   "common": {
-    "teacher": "Professeur",
+    "teacher": "Sarah Dubois",
     "getStarted": "Commencer",
     "print": "Imprimer",
     "copy": "Copier",
@@ -238,5 +239,3 @@
     }
   }
 }
-
-    
