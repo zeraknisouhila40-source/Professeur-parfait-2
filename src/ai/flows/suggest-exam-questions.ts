@@ -88,7 +88,7 @@ const prompt = ai.definePrompt({
   {{/if}}
 
   Each suggestion must have a unique and descriptive title (e.g., "Épreuve de Synthèse sur..." or "Examen à Remplir sur...").
-  The questions must align with the Algerian curriculum for the educational level: {{level}}, {{year}}, for the {{trimester}}.
+  The questions must align with the Algerian curriculum for the educational level: {{level}}, {{year}}, for the {{trimester}}. The content must strictly follow the official Algerian pedagogical program for this specific level.
 
   For each of the two suggestions, provide two distinct parts:
   1.  **examPaper**: The full exam paper, well-formatted using Markdown, ready to be given to students. It must include scoring tables for each section (barème de notation). If an image is relevant, use a Markdown placeholder like '![Image description](https://picsum.photos/seed/1/600/400)'. Use a different seed for each image.
