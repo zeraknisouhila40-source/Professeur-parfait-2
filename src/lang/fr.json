@@ -16,10 +16,7 @@
       "label": "Niveau",
       "placeholder": "Sélectionner le niveau",
       "middleSchool": "Collège",
-      "highSchool": "Lycée",
-      "primary": "Primaire",
-      "secondary": "Secondaire",
-      "elementary": "Élémentaire"
+      "highSchool": "Lycée"
     },
     "year": {
       "label": "Année",

@@ -21,7 +21,7 @@ const formSchema = z.object({
   studentAssignment: z.string().min(20, { message: 'Student assignment must be at least 20 characters.' }),
   examQuestions: z.string().optional(),
   topic: z.string().optional(),
-  level: z.enum(['primary', 'secondary', 'elementary']),
+  level: z.string({ required_error: 'Please select a level.' }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -38,7 +38,6 @@ export default function CorrectionAssistancePage() {
       studentAssignment: '',
       examQuestions: '',
       topic: '',
-      level: 'secondary',
     },
   });
 
@@ -106,9 +105,8 @@ export default function CorrectionAssistancePage() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="primary">{t('common.level.primary')}</SelectItem>
-                            <SelectItem value="secondary">{t('common.level.secondary')}</SelectItem>
-                            <SelectItem value="elementary">{t('common.level.elementary')}</SelectItem>
+                            <SelectItem value="Middle School">{t('common.level.middleSchool')}</SelectItem>
+                            <SelectItem value="High School">{t('common.level.highSchool')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

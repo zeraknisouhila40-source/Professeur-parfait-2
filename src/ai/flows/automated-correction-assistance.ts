@@ -20,9 +20,7 @@ const CorrectAssignmentInputSchema = z.object({
     .optional()
     .describe('The exam questions that were given to the students.'),
   topic: z.string().optional().describe('The topic of the assignment.'),
-  level: z
-    .enum(['primary', 'secondary', 'elementary'])
-    .describe('The educational level of the students.'),
+  level: z.string().describe('The educational level of the students.'),
   language: z.enum(['en', 'fr']).describe('The language of the assignment.'),
 });
 export type CorrectAssignmentInput = z.infer<typeof CorrectAssignmentInputSchema>;

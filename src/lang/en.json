@@ -16,10 +16,7 @@
       "label": "Level",
       "placeholder": "Select level",
       "middleSchool": "Middle School",
-      "highSchool": "High School",
-      "primary": "Primary",
-      "secondary": "Secondary",
-      "elementary": "Elementary"
+      "highSchool": "High School"
     },
     "year": {
       "label": "Year",
