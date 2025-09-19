@@ -1,7 +1,7 @@
 
 {
   "common": {
-    "teacher": "Sarah Dubois",
+    "teacherName": "Nom de l'enseignant",
     "getStarted": "Commencer",
     "print": "Imprimer",
     "copy": "Copier",

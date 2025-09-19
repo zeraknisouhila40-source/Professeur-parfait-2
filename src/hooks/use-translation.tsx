@@ -14,23 +14,35 @@ interface TranslationContextType {
   language: Language;
   setLanguage: (language: Language) => void;
   t: (key: string) => string;
+  teacherName: string;
+  setTeacherName: (name: string) => void;
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
   const [language, setLanguageState] = useState<Language>('en');
+  const [teacherName, setTeacherNameState] = useState<string>('Sarah Dubois');
 
   useEffect(() => {
     const storedLanguage = localStorage.getItem('language') as Language;
     if (storedLanguage && (storedLanguage === 'en' || storedLanguage === 'fr')) {
       setLanguageState(storedLanguage);
     }
+    const storedTeacherName = localStorage.getItem('teacherName');
+    if (storedTeacherName) {
+      setTeacherNameState(storedTeacherName);
+    }
   }, []);
 
   const setLanguage = (lang: Language) => {
     localStorage.setItem('language', lang);
     setLanguageState(lang);
+  };
+  
+  const setTeacherName = (name: string) => {
+    localStorage.setItem('teacherName', name);
+    setTeacherNameState(name);
   };
 
   const t = useCallback((key: string): string => {
@@ -51,7 +63,7 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
   }, [language]);
 
   return (
-    <TranslationContext.Provider value={{ language, setLanguage, t }}>
+    <TranslationContext.Provider value={{ language, setLanguage, t, teacherName, setTeacherName }}>
       {children}
     </TranslationContext.Provider>
   );

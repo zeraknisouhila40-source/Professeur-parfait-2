@@ -1,4 +1,5 @@
 'use client';
+import React, { useState, useEffect, useRef } from 'react';
 import { Nav } from '@/components/nav';
 import {
   SidebarProvider,
@@ -10,6 +11,7 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
@@ -21,9 +23,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Pen } from 'lucide-react';
+
 
 function AppLayoutContent({ children }: { children: React.ReactNode }) {
-  const { t, language, setLanguage } = useTranslation();
+  const { t, language, setLanguage, teacherName, setTeacherName } = useTranslation();
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [name, setName] = useState(teacherName);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setName(teacherName);
+  }, [teacherName]);
+
+  useEffect(() => {
+    if (isEditingName && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditingName]);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  };
+
+  const handleNameSave = () => {
+    setTeacherName(name);
+    setIsEditingName(false);
+  };
+
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleNameSave();
+    }
+    if (e.key === 'Escape') {
+      setName(teacherName);
+      setIsEditingName(false);
+    }
+  };
+
 
   return (
     <SidebarProvider>
@@ -46,7 +83,30 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
               <AvatarFallback>PP</AvatarFallback>
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <span className="text-sm font-medium">{t('common.teacher')}</span>
+              {isEditingName ? (
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  value={name}
+                  onChange={handleNameChange}
+                  onBlur={handleNameSave}
+                  onKeyDown={handleNameKeyDown}
+                  className="h-7 text-sm"
+                  placeholder={t('common.teacherName')}
+                />
+              ) : (
+                <div 
+                  className="flex items-center gap-2 cursor-pointer group"
+                  onClick={() => setIsEditingName(true)}
+                  onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(true)}
+                  tabIndex={0}
+                  role="button"
+                  aria-label="Edit teacher name"
+                >
+                  <span className="text-sm font-medium">{teacherName}</span>
+                  <Pen className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              )}
               <Select
                 value={language}
                 onValueChange={(value) => setLanguage(value as 'en' | 'fr')}
