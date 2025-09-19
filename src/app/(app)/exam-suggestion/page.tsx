@@ -6,7 +6,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { suggestExamQuestions } from '@/ai/flows/suggest-exam-questions';
-import type { SuggestExamQuestionsInput, SuggestExamQuestionsOutput } from '@/ai/flows/suggest-exam-questions-types';
+import type { SuggestExamQuestionsOutput } from '@/ai/flows/suggest-exam-questions-types';
 import { marked } from 'marked';
 import jsPDF from 'jspdf';
 import { useTranslation } from '@/hooks/use-translation';
@@ -76,12 +76,12 @@ export default function ExamSuggestionPage() {
   };
 
   const comprehensiveExams = useMemo(() => 
-    examSuggestions.filter(s => s.title.toLowerCase().includes('synthèse')), 
+    examSuggestions.filter(s => s.title.toLowerCase().includes('synthèse') || s.title.toLowerCase().includes('comprehensive')), 
     [examSuggestions]
   );
   
   const onSheetExams = useMemo(() => 
-    examSuggestions.filter(s => s.title.toLowerCase().includes('à remplir')), 
+    examSuggestions.filter(s => s.title.toLowerCase().includes('à remplir') || s.title.toLowerCase().includes('on-sheet')), 
     [examSuggestions]
   );
 
@@ -90,7 +90,7 @@ export default function ExamSuggestionPage() {
         return marked(markdown);
     } catch (e) {
         console.error("Error parsing markdown", e);
-        return markdown;
+        return `<p>Error parsing content.</p>`;
     }
   }
 
@@ -107,25 +107,26 @@ export default function ExamSuggestionPage() {
       const pdf = new jsPDF('p', 'pt', 'a4');
       const safeFont = 'Helvetica';
       pdf.setFont(safeFont);
-
+      
       const addContentToPdf = (markdown: string, title: string, withHeader: boolean) => {
         return new Promise<void>((resolve, reject) => {
-          const htmlContent = getHtml(markdown);
-          const combinedHtml = `
-            <div style="font-family: ${safeFont}; color: black; width: 525pt; padding: 35pt;">
+          const contentHtml = getHtml(markdown);
+          const fullHtml = `
+            <div style="font-family: ${safeFont}; color: black; max-width: 525pt; padding: 0;">
               ${withHeader ? headerElement.innerHTML : ''}
               <h2>${title}</h2>
-              <div class="prose prose-sm max-w-none">${htmlContent}</div>
+              <div class="prose prose-sm max-w-none">${contentHtml}</div>
             </div>
           `;
-          pdf.html(combinedHtml, {
+          
+          pdf.html(fullHtml, {
             callback: (doc) => {
               resolve();
             },
             autoPaging: 'text',
             margin: [40, 40, 40, 40],
+            width: 525,
             windowWidth: 700,
-            width: 525
           });
         });
       };
@@ -145,24 +146,19 @@ export default function ExamSuggestionPage() {
     }
   };
 
-
   const handlePrint = (contentId: string, headerId: string) => {
     const printContent = document.getElementById(contentId);
-    if (printContent) {
-      const header = document.getElementById(headerId);
-      const headerHTML = header ? header.innerHTML : '';
-      const contentHTML = printContent.innerHTML;
+    const header = document.getElementById(headerId);
+    if (printContent && header) {
       const printWindow = window.open('', '_blank');
       if (printWindow) {
         printWindow.document.write(`<html><head><title>Print</title>
         <style>
           body { font-family: 'PT Sans', sans-serif; }
-          .prose { max-width: 100%; } 
-          img { max-width: 100%; height: auto; }
-          table { width: 100%; border-collapse: collapse; } 
-          th, td { border: 1px solid #ccc; padding: 8px; }
+          .prose { max-width: 100%; } img { max-width: 100%; height: auto; }
+          table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ccc; padding: 8px; }
         </style>
-        </head><body>${headerHTML}${contentHTML}</body></html>`);
+        </head><body>${header.innerHTML}${printContent.innerHTML}</body></html>`);
         printWindow.document.close();
         printWindow.focus();
         printWindow.print();
@@ -380,14 +376,14 @@ export default function ExamSuggestionPage() {
                         <div className="space-y-6">
                            {comprehensiveExams.length > 0 && (
                             <div className="space-y-4">
-                              <h2 className="text-xl font-bold">Épreuves de synthèse (à corriger sur feuille double)</h2>
+                              <h2 className="text-xl font-bold">{t('language') === 'fr' ? 'Épreuves de synthèse' : 'Comprehensive Exams'}</h2>
                               {comprehensiveExams.map((suggestion, index) => renderSuggestion(suggestion, index, 'comprehensive'))}
                             </div>
                           )}
 
                           {onSheetExams.length > 0 && (
                             <div className="space-y-4">
-                              <h2 className="text-xl font-bold">Épreuves à remplir (à corriger sur la feuille d'examen)</h2>
+                              <h2 className="text-xl font-bold">{t('language') === 'fr' ? 'Épreuves à remplir' : 'On-Sheet Exams'}</h2>
                               {onSheetExams.map((suggestion, index) => renderSuggestion(suggestion, index, 'on-sheet'))}
                             </div>
                           )}
@@ -400,5 +396,3 @@ export default function ExamSuggestionPage() {
     </div>
   );
 }
-
-    
