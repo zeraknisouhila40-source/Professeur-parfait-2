@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,7 +18,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Download, Printer, Copy } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PdfHeader } from '@/components/pdf-header';
 
@@ -39,7 +38,7 @@ export default function ExamSuggestionPage() {
   const { t, language } = useTranslation();
   const [examSuggestions, setExamSuggestions] = useState<SuggestExamQuestionsOutput['suggestions']>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDownloading, setIsDownloading] = useState<number | null>(null);
+  const [isDownloading, setIsDownloading] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -75,6 +74,16 @@ export default function ExamSuggestionPage() {
     }
   };
 
+  const comprehensiveExams = useMemo(() => 
+    examSuggestions.filter(s => s.title.toLowerCase().includes('synthèse')), 
+    [examSuggestions]
+  );
+  
+  const onSheetExams = useMemo(() => 
+    examSuggestions.filter(s => s.title.toLowerCase().includes('à remplir')), 
+    [examSuggestions]
+  );
+
   const getHtml = (markdown: string) => {
     try {
         return marked(markdown);
@@ -84,12 +93,12 @@ export default function ExamSuggestionPage() {
     }
   }
 
-  const handleDownloadPdf = async (suggestion: ExamSuggestion, index: number) => {
-    setIsDownloading(index);
+  const handleDownloadPdf = async (suggestion: ExamSuggestion, suggestionId: string) => {
+    setIsDownloading(suggestionId);
     try {
-      const examPaperElement = document.getElementById(`exam-paper-${index}`);
-      const answerKeyElement = document.getElementById(`answer-key-${index}`);
-      const headerElement = document.getElementById(`pdf-header-${index}`);
+      const examPaperElement = document.getElementById(`exam-paper-${suggestionId}`);
+      const answerKeyElement = document.getElementById(`answer-key-${suggestionId}`);
+      const headerElement = document.getElementById(`pdf-header-${suggestionId}`);
 
       if (!examPaperElement || !answerKeyElement || !headerElement) {
         toast({ title: t('common.error.title'), description: t('examSuggestion.toast.pdfError'), variant: 'destructive' });
@@ -101,23 +110,27 @@ export default function ExamSuggestionPage() {
       const safeFont = 'Helvetica';
       pdf.setFont(safeFont);
 
-      const addContentToPdf = async (element: HTMLElement, title: string, withHeader: boolean) => {
-        const combinedHtml = `
-          <div style="font-family: ${safeFont}; color: black; width: 525pt; padding: 35pt;">
-            ${withHeader ? headerElement.innerHTML : ''}
-            <h2>${title}</h2>
-            ${element.innerHTML}
-          </div>
-        `;
-        await pdf.html(combinedHtml, {
-          callback: (doc) => {},
-          autoPaging: 'text',
-          margin: [40, 40, 40, 40],
-          windowWidth: 700,
-          width: 525
+      const addContentToPdf = (element: HTMLElement, title: string, withHeader: boolean) => {
+        return new Promise<void>((resolve) => {
+          const combinedHtml = `
+            <div style="font-family: ${safeFont}; color: black; width: 525pt; padding: 35pt;">
+              ${withHeader ? headerElement.innerHTML : ''}
+              <h2>${title}</h2>
+              ${element.innerHTML}
+            </div>
+          `;
+          pdf.html(combinedHtml, {
+            callback: (doc) => {
+              resolve();
+            },
+            autoPaging: 'text',
+            margin: [40, 40, 40, 40],
+            windowWidth: 700,
+            width: 525
+          });
         });
       };
-
+      
       await addContentToPdf(examPaperElement, t('examSuggestion.results.tabs.examPaper'), true);
       pdf.addPage();
       await addContentToPdf(answerKeyElement, t('examSuggestion.results.tabs.answerKey'), false);
@@ -133,10 +146,11 @@ export default function ExamSuggestionPage() {
     }
   };
 
-  const handlePrint = (contentId: string) => {
+
+  const handlePrint = (contentId: string, headerId: string) => {
     const printContent = document.getElementById(contentId);
     if (printContent) {
-      const header = document.getElementById('pdf-header-print');
+      const header = document.getElementById(headerId);
       const headerHTML = header ? header.innerHTML : '';
       const contentHTML = printContent.innerHTML;
       const printWindow = window.open('', '_blank');
@@ -166,6 +180,55 @@ export default function ExamSuggestionPage() {
     });
   };
 
+  const renderSuggestion = (suggestion: ExamSuggestion, index: number, type: 'comprehensive' | 'on-sheet') => {
+    const suggestionId = `${type}-${index}`;
+    return (
+      <div key={suggestionId} className="border bg-secondary/30 rounded-lg px-4 py-4 space-y-4">
+        <h3 className="font-semibold text-lg">{suggestion.title}</h3>
+        <div className="hidden">
+          <PdfHeader id={`pdf-header-${suggestionId}`} />
+        </div>
+        <div className="space-y-4 pt-2">
+            <Tabs defaultValue="exam-paper" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="exam-paper">{t('examSuggestion.results.tabs.examPaper')}</TabsTrigger>
+                    <TabsTrigger value="answer-key">{t('examSuggestion.results.tabs.answerKey')}</TabsTrigger>
+                </TabsList>
+                <TabsContent value="exam-paper">
+                    <div id={`exam-paper-${suggestionId}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.examPaper) }} />
+                    <div className="flex gap-2 mt-2">
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(`exam-paper-${suggestionId}`, `pdf-header-${suggestionId}`)}><Printer className="mr-2 h-4 w-4" /> {t('common.print')}</Button>
+                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.examPaper)}><Copy className="mr-2 h-4 w-4" /> {t('common.copy')}</Button>
+                    </div>
+                </TabsContent>
+                <TabsContent value="answer-key">
+                    <div id={`answer-key-${suggestionId}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.answerKey) }} />
+                     <div className="flex gap-2 mt-2">
+                        <Button variant="outline" size="sm" onClick={() => handlePrint(`answer-key-${suggestionId}`, `pdf-header-${suggestionId}`)}><Printer className="mr-2 h-4 w-4" /> {t('common.print')}</Button>
+                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.answerKey)}><Copy className="mr-2 h-4 w-4" /> {t('common.copy')}</Button>
+                    </div>
+                </TabsContent>
+            </Tabs>
+            <div className="flex gap-2 mt-4">
+              <Button
+                variant="outline"
+                onClick={() => handleDownloadPdf(suggestion, suggestionId)}
+                disabled={isDownloading === suggestionId}
+                className="w-full"
+              >
+                {isDownloading === suggestionId ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="mr-2 h-4 w-4" />
+                )}
+                {t('examSuggestion.results.downloadPdf')}
+              </Button>
+            </div>
+        </div>
+      </div>
+    );
+  };
+
 
   return (
     <div className="space-y-6">
@@ -173,7 +236,6 @@ export default function ExamSuggestionPage() {
         title={t('examSuggestion.header.title')}
         description={t('examSuggestion.header.description')}
       />
-      <div className="hidden"><PdfHeader id="pdf-header-print" /></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
             <Card className="sticky top-20">
@@ -317,59 +379,21 @@ export default function ExamSuggestionPage() {
                         </div>
                     )}
                     {examSuggestions.length > 0 && (
-                        <Accordion type="single" collapsible className="w-full space-y-4">
-                            {examSuggestions.map((suggestion, index) => (
-                                <AccordionItem value={`item-${index}`} key={index} className="border bg-secondary/30 rounded-lg px-4">
-                                    <AccordionTrigger className="hover:no-underline">
-                                      <div className="flex justify-between items-center w-full">
-                                        <span className="font-semibold text-left">{suggestion.title}</span>
-                                      </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                        <div className="hidden">
-                                          <PdfHeader id={`pdf-header-${index}`} />
-                                        </div>
-                                        <div className="space-y-4 pt-2">
-                                            <Tabs defaultValue="exam-paper" className="w-full">
-                                                <TabsList className="grid w-full grid-cols-2">
-                                                    <TabsTrigger value="exam-paper">{t('examSuggestion.results.tabs.examPaper')}</TabsTrigger>
-                                                    <TabsTrigger value="answer-key">{t('examSuggestion.results.tabs.answerKey')}</TabsTrigger>
-                                                </TabsList>
-                                                <TabsContent value="exam-paper">
-                                                    <div id={`exam-paper-${index}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.examPaper) }} />
-                                                    <div className="flex gap-2 mt-2">
-                                                        <Button variant="outline" size="sm" onClick={() => handlePrint(`exam-paper-${index}`)}><Printer className="mr-2 h-4 w-4" /> {t('common.print')}</Button>
-                                                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.examPaper)}><Copy className="mr-2 h-4 w-4" /> {t('common.copy')}</Button>
-                                                    </div>
-                                                </TabsContent>
-                                                <TabsContent value="answer-key">
-                                                    <div id={`answer-key-${index}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.answerKey) }} />
-                                                     <div className="flex gap-2 mt-2">
-                                                        <Button variant="outline" size="sm" onClick={() => handlePrint(`answer-key-${index}`)}><Printer className="mr-2 h-4 w-4" /> {t('common.print')}</Button>
-                                                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.answerKey)}><Copy className="mr-2 h-4 w-4" /> {t('common.copy')}</Button>
-                                                    </div>
-                                                </TabsContent>
-                                            </Tabs>
-                                            <div className="flex gap-2 mt-4">
-                                              <Button
-                                                variant="outline"
-                                                onClick={() => handleDownloadPdf(suggestion, index)}
-                                                disabled={isDownloading === index}
-                                                className="w-full"
-                                              >
-                                                {isDownloading === index ? (
-                                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                ) : (
-                                                  <Download className="mr-2 h-4 w-4" />
-                                                )}
-                                                {t('examSuggestion.results.downloadPdf')}
-                                              </Button>
-                                            </div>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            ))}
-                        </Accordion>
+                        <div className="space-y-6">
+                           {comprehensiveExams.length > 0 && (
+                            <div className="space-y-4">
+                              <h2 className="text-xl font-bold">Épreuves de synthèse (à corriger sur feuille double)</h2>
+                              {comprehensiveExams.map((suggestion, index) => renderSuggestion(suggestion, index, 'comprehensive'))}
+                            </div>
+                          )}
+
+                          {onSheetExams.length > 0 && (
+                            <div className="space-y-4">
+                              <h2 className="text-xl font-bold">Épreuves à remplir (à corriger sur la feuille d'examen)</h2>
+                              {onSheetExams.map((suggestion, index) => renderSuggestion(suggestion, index, 'on-sheet'))}
+                            </div>
+                          )}
+                        </div>
                     )}
                 </CardContent>
             </Card>
@@ -378,3 +402,5 @@ export default function ExamSuggestionPage() {
     </div>
   );
 }
+
+    

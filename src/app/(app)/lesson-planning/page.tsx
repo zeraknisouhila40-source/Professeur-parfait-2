@@ -107,14 +107,17 @@ export default function LessonPlanningPage() {
         </div>
       `;
 
-      await pdf.html(combinedHtml, {
-        callback: function (doc) {
-          doc.save(`Lesson_Plan_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
-        },
-        autoPaging: 'text',
-        margin: [40, 40, 40, 40],
-        windowWidth: 700,
-        width: 525
+      await new Promise<void>((resolve) => {
+        pdf.html(combinedHtml, {
+          callback: function (doc) {
+            doc.save(`Lesson_Plan_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
+            resolve();
+          },
+          autoPaging: 'text',
+          margin: [40, 40, 40, 40],
+          windowWidth: 700,
+          width: 525
+        });
       });
 
       toast({ title: t('lessonPlanning.toast.downloadSuccess.title'), description: t('lessonPlanning.toast.downloadSuccess.description') });
@@ -337,3 +340,5 @@ export default function LessonPlanningPage() {
     </div>
   );
 }
+
+    
