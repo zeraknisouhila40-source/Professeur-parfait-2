@@ -56,7 +56,7 @@ const prompt = ai.definePrompt({
   name: 'suggestExamQuestionsPrompt',
   input: {schema: SuggestExamQuestionsInputSchema},
   output: {schema: SuggestExamQuestionsOutputSchema},
-  prompt: `You are an AI assistant designed to help {{language === 'fr' ? 'French' : 'English'}} teachers in Algeria create complete exams based on the Algerian education system.
+  prompt: `You are an AI assistant designed to help {{#if (eq language 'fr')}}French{{else}}English{{/if}} teachers in Algeria create complete exams based on the Algerian education system.
 
   Generate exactly {{numberOfSuggestions}} distinct exam suggestions. Each suggestion must include a complete exam paper and a separate answer key.
 
