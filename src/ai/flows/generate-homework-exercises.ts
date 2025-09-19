@@ -12,7 +12,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const GenerateHomeworkExercisesInputSchema = z.object({
+export const GenerateHomeworkExercisesInputSchema = z.object({
   topic: z.string().describe('The specific topic covered in class for which homework is needed.'),
   skillLevel: z
     .enum(['beginner', 'intermediate', 'advanced'])
@@ -29,26 +29,23 @@ const GenerateHomeworkExercisesInputSchema = z.object({
 });
 export type GenerateHomeworkExercisesInput = z.infer<typeof GenerateHomeworkExercisesInputSchema>;
 
-const GenerateHomeworkExercisesOutputSchema = z.object({
+export const GenerateHomeworkExercisesOutputSchema = z.object({
   exercises: z.array(z.string()).describe('An array of homework exercises tailored to the specified topic and skill level.'),
 });
 export type GenerateHomeworkExercisesOutput = z.infer<typeof GenerateHomeworkExercisesOutputSchema>;
 
-const FlowInputSchema = GenerateHomeworkExercisesInputSchema.extend({
-  isFrench: z.boolean().optional(),
-});
-
 export async function generateHomeworkExercises(input: GenerateHomeworkExercisesInput): Promise<GenerateHomeworkExercisesOutput> {
-  return generateHomeworkExercisesFlow({
-    ...input,
-    isFrench: input.language === 'fr',
-  });
+  return generateHomeworkExercisesFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'generateHomeworkExercisesPrompt',
   model: 'googleai/gemini-2.5-flash',
-  input: {schema: FlowInputSchema},
+  input: {
+    schema: GenerateHomeworkExercisesInputSchema.extend({
+      isFrench: z.boolean(),
+    }),
+  },
   output: {schema: GenerateHomeworkExercisesOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create homework exercises according to the Algerian education system.
 
@@ -68,11 +65,12 @@ const prompt = ai.definePrompt({
 const generateHomeworkExercisesFlow = ai.defineFlow(
   {
     name: 'generateHomeworkExercisesFlow',
-    inputSchema: FlowInputSchema,
+    inputSchema: GenerateHomeworkExercisesInputSchema,
     outputSchema: GenerateHomeworkExercisesOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const isFrench = input.language === 'fr';
+    const {output} = await prompt({...input, isFrench});
     return output!;
   }
 );

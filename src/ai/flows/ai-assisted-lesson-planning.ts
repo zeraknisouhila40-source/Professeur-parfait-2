@@ -14,7 +14,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const AiAssistedLessonPlanningInputSchema = z.object({
+export const AiAssistedLessonPlanningInputSchema = z.object({
   topic: z.string().describe('The topic of the lesson plan.'),
   numberOfClassMeetings: z
     .number()
@@ -34,7 +34,7 @@ export type AiAssistedLessonPlanningInput = z.infer<
   typeof AiAssistedLessonPlanningInputSchema
 >;
 
-const AiAssistedLessonPlanningOutputSchema = z.object({
+export const AiAssistedLessonPlanningOutputSchema = z.object({
   lessonPlan: z
     .string()
     .describe(
@@ -45,23 +45,20 @@ export type AiAssistedLessonPlanningOutput = z.infer<
   typeof AiAssistedLessonPlanningOutputSchema
 >;
 
-const FlowInputSchema = AiAssistedLessonPlanningInputSchema.extend({
-  isFrench: z.boolean().optional(),
-});
-
 export async function aiAssistedLessonPlanning(
   input: AiAssistedLessonPlanningInput
 ): Promise<AiAssistedLessonPlanningOutput> {
-  return aiAssistedLessonPlanningFlow({
-    ...input,
-    isFrench: input.language === 'fr',
-  });
+  return aiAssistedLessonPlanningFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'aiAssistedLessonPlanningPrompt',
   model: 'googleai/gemini-2.5-flash',
-  input: {schema: FlowInputSchema},
+  input: {
+    schema: AiAssistedLessonPlanningInputSchema.extend({
+      isFrench: z.boolean(),
+    }),
+  },
   output: {schema: AiAssistedLessonPlanningOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create effective lesson plans based on the Algerian education system.
 
@@ -88,11 +85,12 @@ const prompt = ai.definePrompt({
 const aiAssistedLessonPlanningFlow = ai.defineFlow(
   {
     name: 'aiAssistedLessonPlanningFlow',
-    inputSchema: FlowInputSchema,
+    inputSchema: AiAssistedLessonPlanningInputSchema,
     outputSchema: AiAssistedLessonPlanningOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const isFrench = input.language === 'fr';
+    const {output} = await prompt({...input, isFrench});
     return output!;
   }
 );

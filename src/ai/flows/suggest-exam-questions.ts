@@ -11,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const SuggestExamQuestionsInputSchema = z.object({
+export const SuggestExamQuestionsInputSchema = z.object({
   topic: z.string().optional().describe('The topic for which to generate exam questions.'),
   keywords: z.string().optional().describe('Keywords to refine the exam questions.'),
   level: z.string().describe("The educational level (e.g., 'middle', 'secondary')."),
@@ -37,7 +37,7 @@ const ExamSuggestionSchema = z.object({
   answerKey: z.string().describe('The corresponding answer key for the exam paper, formatted for the teacher. Use Markdown for formatting.'),
 });
 
-const SuggestExamQuestionsOutputSchema = z.object({
+export const SuggestExamQuestionsOutputSchema = z.object({
   suggestions: z
     .array(ExamSuggestionSchema)
     .describe('An array of distinct exam suggestions, each with a title, a full exam paper, and a separate answer key.'),
@@ -46,23 +46,20 @@ export type SuggestExamQuestionsOutput = z.infer<
   typeof SuggestExamQuestionsOutputSchema
 >;
 
-const FlowInputSchema = SuggestExamQuestionsInputSchema.extend({
-  isFrench: z.boolean().optional(),
-});
-
 export async function suggestExamQuestions(
   input: SuggestExamQuestionsInput
 ): Promise<SuggestExamQuestionsOutput> {
-  return suggestExamQuestionsFlow({
-    ...input,
-    isFrench: input.language === 'fr',
-  });
+  return suggestExamQuestionsFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'suggestExamQuestionsPrompt',
   model: 'googleai/gemini-2.5-flash',
-  input: {schema: FlowInputSchema},
+  input: {
+    schema: SuggestExamQuestionsInputSchema.extend({
+      isFrench: z.boolean(),
+    }),
+  },
   output: {schema: SuggestExamQuestionsOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create complete exams based on the Algerian education system.
 
@@ -117,11 +114,12 @@ const prompt = ai.definePrompt({
 const suggestExamQuestionsFlow = ai.defineFlow(
   {
     name: 'suggestExamQuestionsFlow',
-    inputSchema: FlowInputSchema,
+    inputSchema: SuggestExamQuestionsInputSchema,
     outputSchema: SuggestExamQuestionsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const isFrench = input.language === 'fr';
+    const {output} = await prompt({...input, isFrench});
     return output!;
   }
 );

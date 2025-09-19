@@ -11,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const CorrectAssignmentInputSchema = z.object({
+export const CorrectAssignmentInputSchema = z.object({
   studentAssignment: z
     .string()
     .describe('The text of the student assignment.'),
@@ -25,7 +25,7 @@ const CorrectAssignmentInputSchema = z.object({
 });
 export type CorrectAssignmentInput = z.infer<typeof CorrectAssignmentInputSchema>;
 
-const CorrectAssignmentOutputSchema = z.object({
+export const CorrectAssignmentOutputSchema = z.object({
   correctedAssignment: z
     .string()
     .describe('The corrected version of the student assignment.'),
@@ -38,21 +38,18 @@ const CorrectAssignmentOutputSchema = z.object({
 });
 export type CorrectAssignmentOutput = z.infer<typeof CorrectAssignmentOutputSchema>;
 
-const FlowInputSchema = CorrectAssignmentInputSchema.extend({
-  isFrench: z.boolean().optional(),
-});
-
 export async function correctAssignment(input: CorrectAssignmentInput): Promise<CorrectAssignmentOutput> {
-  return correctAssignmentFlow({
-    ...input,
-    isFrench: input.language === 'fr',
-  });
+  return correctAssignmentFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'correctAssignmentPrompt',
   model: 'googleai/gemini-2.5-flash',
-  input: {schema: FlowInputSchema},
+  input: {
+    schema: CorrectAssignmentInputSchema.extend({
+      isFrench: z.boolean(),
+    }),
+  },
   output: {schema: CorrectAssignmentOutputSchema},
   prompt: `You are an expert {{#if isFrench}}French{{else}}English{{/if}} teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.
 
@@ -73,11 +70,12 @@ Suggested Improvements:`,
 const correctAssignmentFlow = ai.defineFlow(
   {
     name: 'correctAssignmentFlow',
-    inputSchema: FlowInputSchema,
+    inputSchema: CorrectAssignmentInputSchema,
     outputSchema: CorrectAssignmentOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const isFrench = input.language === 'fr';
+    const {output} = await prompt({...input, isFrench});
     return output!;
   }
 );
