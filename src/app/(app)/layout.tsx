@@ -22,7 +22,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Button variant="ghost" size="icon" className="h-10 w-10 text-primary">
               <Icons.logo />
             </Button>
-            <h2 className="text-lg font-semibold font-headline group-data-[collapsible=icon]:hidden">Professeur Parfait</h2>
+            <h2 className="text-lg font-semibold font-headline group-data-[collapsible=icon]:hidden">Perfect Professor</h2>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -35,8 +35,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <AvatarFallback>PP</AvatarFallback>
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <span className="text-sm font-medium">Enseignant</span>
-              <span className="text-xs text-muted-foreground">Français</span>
+              <span className="text-sm font-medium">Teacher</span>
+              <span className="text-xs text-muted-foreground">English</span>
             </div>
           </div>
         </SidebarFooter>

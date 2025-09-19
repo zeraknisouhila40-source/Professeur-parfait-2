@@ -13,26 +13,26 @@ import { PageHeader } from '@/components/page-header';
 const features = [
   {
     icon: FileText,
-    title: "Suggestion d'Examen",
-    description: "Générez des questions d'examen basées sur des sujets, des difficultés et des programmes spécifiques.",
+    title: "Exam Suggestion",
+    description: "Generate exam questions based on specific topics, difficulties, and curricula.",
     href: '/exam-suggestion',
   },
   {
     icon: PenSquare,
-    title: 'Aide à la Correction',
-    description: "Obtenez une assistance automatisée pour corriger les devoirs et identifier les erreurs courantes.",
+    title: 'Correction Assistance',
+    description: "Get automated assistance to correct homework and identify common errors.",
     href: '/correction-assistance',
   },
   {
     icon: BookMarked,
-    title: 'Création de Devoirs',
-    description: 'Créez des exercices personnalisés adaptés à différents niveaux de compétence et sujets.',
+    title: 'Homework Creation',
+    description: 'Create customized exercises tailored to different skill levels and topics.',
     href: '/homework-creation',
   },
   {
     icon: CalendarCheck,
-    title: 'Planification de Leçon',
-    description: "Planifiez des cours complets avec des objectifs, des activités et des évaluations clairs.",
+    title: 'Lesson Planning',
+    description: "Plan complete lessons with clear objectives, activities, and assessments.",
     href: '/lesson-planning',
   },
 ];
@@ -41,8 +41,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Bienvenue, Professeur !"
-        description="Professeur Parfait est votre assistant IA pour simplifier la préparation de vos cours de français."
+        title="Welcome, Professor!"
+        description="Perfect Professor is your AI assistant to simplify preparing your English classes."
       />
       <div className="grid gap-6 md:grid-cols-2">
         {features.map((feature) => (
@@ -57,7 +57,7 @@ export default function DashboardPage() {
               <p className="text-muted-foreground flex-grow mb-4">{feature.description}</p>
               <Link href={feature.href} className="mt-auto">
                 <Button className="w-full">
-                  Commencer <ArrowRight className="ml-2 h-4 w-4" />
+                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </CardContent>

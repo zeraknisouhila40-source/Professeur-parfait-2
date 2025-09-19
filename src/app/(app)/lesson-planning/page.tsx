@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { aiAssistedLessonPlanning, type AiAssistedLessonPlanningInput } from '@/ai/flows/ai-assisted-lesson-planning';
 import jsPDF from 'jspdf';
 import { marked } from 'marked';
-import html2canvas from 'html2canvas';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,12 +21,12 @@ import { PdfHeader } from '@/components/pdf-header';
 
 
 const formSchema = z.object({
-  topic: z.string().min(3, { message: 'Le sujet doit contenir au moins 3 caractères.' }),
-  numberOfClassMeetings: z.coerce.number().int().min(1, { message: 'Doit être au moins 1.' }).max(20, { message: 'Ne peut pas dépasser 20.' }),
+  topic: z.string().min(3, { message: 'Topic must be at least 3 characters.' }),
+  numberOfClassMeetings: z.coerce.number().int().min(1, { message: 'Must be at least 1.' }).max(20, { message: 'Cannot exceed 20.' }),
   prerequisiteKnowledge: z.string().optional(),
-  level: z.string({ required_error: 'Veuillez sélectionner un niveau.' }),
-  year: z.string({ required_error: 'Veuillez sélectionner une année.' }),
-  trimester: z.string({ required_error: 'Veuillez sélectionner un trimestre.' }),
+  level: z.string({ required_error: 'Please select a level.' }),
+  year: z.string({ required_error: 'Please select a year.' }),
+  trimester: z.string({ required_error: 'Please select a trimester.' }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -56,14 +55,14 @@ export default function LessonPlanningPage() {
       const result = await aiAssistedLessonPlanning(data as AiAssistedLessonPlanningInput);
       setLessonPlan(result.lessonPlan);
       toast({
-        title: 'Succès !',
-        description: 'Votre plan de leçon a été généré.',
+        title: 'Success!',
+        description: 'Your lesson plan has been generated.',
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la génération du plan de leçon. Veuillez réessayer.',
+        title: 'Error',
+        description: 'An error occurred while generating the lesson plan. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -89,39 +88,34 @@ export default function LessonPlanningPage() {
       const headerElement = document.getElementById('pdf-header-lesson');
 
       if (!lessonPlanElement || !headerElement) {
-        toast({ title: 'Erreur', description: "Impossible de trouver le contenu du plan de leçon.", variant: 'destructive' });
+        toast({ title: 'Error', description: "Could not find lesson plan content.", variant: 'destructive' });
         setIsDownloading(false);
         return;
       }
       
       const pdf = new jsPDF('p', 'pt', 'a4');
       
-      const headerHtml = headerElement.outerHTML;
-      const lessonPlanHtml = lessonPlanElement.outerHTML;
-      
       const combinedHtml = `
-        <div style="font-family: 'PT Sans', sans-serif; color: black; width: 525pt">
-          ${headerHtml}
-          ${lessonPlanHtml}
+        <div style="font-family: 'PT Sans', sans-serif; color: black; width: 525pt; padding: 35pt;">
+          ${headerElement.innerHTML}
+          ${lessonPlanElement.innerHTML}
         </div>
       `;
 
       await pdf.html(combinedHtml, {
         callback: function (doc) {
-          doc.save(`Plan_de_leçon_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
+          doc.save(`Lesson_Plan_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
         },
-        x: 35,
-        y: 35,
         html2canvas: {
           scale: 0.7
         },
         autoPaging: 'text',
       });
 
-      toast({ title: 'Téléchargement réussi', description: 'Le PDF du plan de leçon a été téléchargé.' });
+      toast({ title: 'Download Successful', description: 'The lesson plan PDF has been downloaded.' });
     } catch (error) {
       console.error('Error generating PDF:', error);
-      toast({ title: 'Erreur de téléchargement', description: 'Une erreur est survenue lors de la création du PDF.', variant: 'destructive' });
+      toast({ title: 'Download Error', description: 'An error occurred while creating the PDF.', variant: 'destructive' });
     } finally {
       setIsDownloading(false);
     }
@@ -136,7 +130,7 @@ export default function LessonPlanningPage() {
       const contentHTML = printContent.innerHTML;
       const printWindow = window.open('', '_blank');
       if (printWindow) {
-        printWindow.document.write(`<html><head><title>Imprimer le Plan de Leçon</title>
+        printWindow.document.write(`<html><head><title>Print Lesson Plan</title>
         <style>
           body { font-family: 'PT Sans', sans-serif; }
           .prose { max-width: 100%; }
@@ -154,8 +148,8 @@ export default function LessonPlanningPage() {
     if (lessonPlan) {
       navigator.clipboard.writeText(lessonPlan);
       toast({
-        title: 'Copié !',
-        description: "Le plan de leçon a été copié dans le presse-papiers.",
+        title: 'Copied!',
+        description: "The lesson plan has been copied to the clipboard.",
       });
     }
   };
@@ -167,15 +161,15 @@ export default function LessonPlanningPage() {
         <PdfHeader id="pdf-header-lesson" />
       </div>
       <PageHeader
-        title="Planification de Leçon"
-        description="Créez des plans de cours détaillés avec l'aide de l'IA."
+        title="Lesson Planning"
+        description="Create detailed lesson plans with AI assistance."
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
             <CardHeader>
-              <CardTitle>Paramètres de la leçon</CardTitle>
-              <CardDescription>Remplissez les détails pour générer le plan de leçon.</CardDescription>
+              <CardTitle>Lesson Parameters</CardTitle>
+              <CardDescription>Fill in the details to generate the lesson plan.</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -185,9 +179,9 @@ export default function LessonPlanningPage() {
                     name="topic"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Sujet de la leçon</FormLabel>
+                        <FormLabel>Lesson Topic</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: L'imparfait et le passé composé" {...field} />
+                          <Input placeholder="Ex: Imperfect and past tense" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -198,16 +192,16 @@ export default function LessonPlanningPage() {
                       name="level"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Niveau</FormLabel>
+                          <FormLabel>Level</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Choisir le niveau" />
+                                  <SelectValue placeholder="Select level" />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                              <SelectItem value="Enseignement moyen">Enseignement moyen</SelectItem>
-                              <SelectItem value="Enseignement secondaire">Enseignement secondaire</SelectItem>
+                              <SelectItem value="Middle School">Middle School</SelectItem>
+                              <SelectItem value="High School">High School</SelectItem>
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -219,18 +213,18 @@ export default function LessonPlanningPage() {
                       name="year"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Année</FormLabel>
+                          <FormLabel>Year</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Choisir l'année" />
+                                  <SelectValue placeholder="Select year" />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                  <SelectItem value="1ère année">1ère année</SelectItem>
-                                  <SelectItem value="2ème année">2ème année</SelectItem>
-                                  <SelectItem value="3ème année">3ème année</SelectItem>
-                                  {level === 'Enseignement moyen' && <SelectItem value="4ème année">4ème année (pour le moyen)</SelectItem>}
+                                  <SelectItem value="1st year">1st year</SelectItem>
+                                  <SelectItem value="2nd year">2nd year</SelectItem>
+                                  <SelectItem value="3rd year">3rd year</SelectItem>
+                                  {level === 'Middle School' && <SelectItem value="4th year">4th year (for middle school)</SelectItem>}
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -242,17 +236,17 @@ export default function LessonPlanningPage() {
                       name="trimester"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Trimestre</FormLabel>
+                          <FormLabel>Trimester</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Choisir le trimestre" />
+                                  <SelectValue placeholder="Select trimester" />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                              <SelectItem value="1er trimestre">1er trimestre</SelectItem>
-                              <SelectItem value="2ème trimestre">2ème trimestre</SelectItem>
-                              <SelectItem value="3ème trimestre">3ème trimestre</SelectItem>
+                              <SelectItem value="1st trimester">1st trimester</SelectItem>
+                              <SelectItem value="2nd trimester">2nd trimester</SelectItem>
+                              <SelectItem value="3rd trimester">3rd trimester</SelectItem>
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -264,7 +258,7 @@ export default function LessonPlanningPage() {
                     name="numberOfClassMeetings"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nombre de séances</FormLabel>
+                        <FormLabel>Number of sessions</FormLabel>
                         <FormControl>
                           <Input type="number" min="1" max="20" {...field} />
                         </FormControl>
@@ -277,9 +271,9 @@ export default function LessonPlanningPage() {
                     name="prerequisiteKnowledge"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Connaissances préalables (Optionnel)</FormLabel>
+                        <FormLabel>Prerequisite Knowledge (Optional)</FormLabel>
                         <FormControl>
-                          <Textarea rows={4} placeholder="Décrivez ce que les élèves savent déjà..." {...field} />
+                          <Textarea rows={4} placeholder="Describe what students already know..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -287,7 +281,7 @@ export default function LessonPlanningPage() {
                   />
                   <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Générer le plan de leçon
+                    Generate Lesson Plan
                   </Button>
                 </form>
               </Form>
@@ -297,8 +291,8 @@ export default function LessonPlanningPage() {
         <div className="lg:col-span-2">
           <Card className="min-h-full">
             <CardHeader>
-              <CardTitle>Plan de leçon généré</CardTitle>
-              <CardDescription>Voici le plan de leçon détaillé généré par l'IA.</CardDescription>
+              <CardTitle>Generated Lesson Plan</CardTitle>
+              <CardDescription>Here is the detailed AI-generated lesson plan.</CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading && (
@@ -308,7 +302,7 @@ export default function LessonPlanningPage() {
               )}
               {!isLoading && !lessonPlan && (
                 <div className="flex flex-col items-center justify-center text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg h-96">
-                  <p>Le plan de leçon généré apparaîtra ici.</p>
+                  <p>The generated lesson plan will appear here.</p>
                 </div>
               )}
               {lessonPlan && (
@@ -324,10 +318,10 @@ export default function LessonPlanningPage() {
                       ) : (
                         <Download className="mr-2 h-4 w-4" />
                       )}
-                      Télécharger en PDF
+                      Download as PDF
                     </Button>
-                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Imprimer</Button>
-                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> Copier</Button>
+                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Print</Button>
+                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> Copy</Button>
                   </div>
                 </div>
               )}
@@ -338,5 +332,3 @@ export default function LessonPlanningPage() {
     </div>
   );
 }
-
-    

@@ -17,7 +17,7 @@ import { Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 const formSchema = z.object({
-  studentAssignment: z.string().min(20, { message: 'Le devoir de l\'étudiant doit contenir au moins 20 caractères.' }),
+  studentAssignment: z.string().min(20, { message: 'Student assignment must be at least 20 characters.' }),
   examQuestions: z.string().optional(),
   topic: z.string().optional(),
   level: z.enum(['primary', 'secondary', 'elementary']),
@@ -47,14 +47,14 @@ export default function CorrectionAssistancePage() {
       const result = await correctAssignment(data as CorrectAssignmentInput);
       setCorrectionResult(result);
       toast({
-        title: 'Correction terminée !',
-        description: 'La correction a été générée avec succès.',
+        title: 'Correction Complete!',
+        description: 'The correction has been successfully generated.',
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la correction. Veuillez réessayer.',
+        title: 'Error',
+        description: 'An error occurred during correction. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -65,15 +65,15 @@ export default function CorrectionAssistancePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Aide à la Correction"
-        description="Soumettez le travail d'un élève pour obtenir une correction assistée par l'IA."
+        title="Correction Assistance"
+        description="Submit a student's work to get AI-assisted correction."
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
             <CardHeader>
-              <CardTitle>Soumettre un devoir</CardTitle>
-              <CardDescription>Fournissez les détails du devoir à corriger.</CardDescription>
+              <CardTitle>Submit Assignment</CardTitle>
+              <CardDescription>Provide the details of the assignment to be corrected.</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -83,9 +83,9 @@ export default function CorrectionAssistancePage() {
                     name="studentAssignment"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Devoir de l'élève</FormLabel>
+                        <FormLabel>Student Assignment</FormLabel>
                         <FormControl>
-                          <Textarea rows={8} placeholder="Collez le texte du devoir de l'élève ici..." {...field} />
+                          <Textarea rows={8} placeholder="Paste the student's assignment text here..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -96,17 +96,17 @@ export default function CorrectionAssistancePage() {
                     name="level"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Niveau Éducatif</FormLabel>
+                        <FormLabel>Educational Level</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Choisir un niveau" />
+                              <SelectValue placeholder="Select a level" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="primary">Primaire</SelectItem>
-                            <SelectItem value="secondary">Secondaire</SelectItem>
-                            <SelectItem value="elementary">Élémentaire</SelectItem>
+                            <SelectItem value="primary">Primary</SelectItem>
+                            <SelectItem value="secondary">Secondary</SelectItem>
+                            <SelectItem value="elementary">Elementary</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -118,9 +118,9 @@ export default function CorrectionAssistancePage() {
                     name="examQuestions"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Questions d'examen (Optionnel)</FormLabel>
+                        <FormLabel>Exam Questions (Optional)</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Entrez les questions d'examen correspondantes..." {...field} />
+                          <Textarea placeholder="Enter the corresponding exam questions..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -128,7 +128,7 @@ export default function CorrectionAssistancePage() {
                   />
                   <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Corriger le devoir
+                    Correct Assignment
                   </Button>
                 </form>
               </Form>
@@ -138,8 +138,8 @@ export default function CorrectionAssistancePage() {
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Résultats de la correction</CardTitle>
-              <CardDescription>Voici l'analyse générée par l'IA.</CardDescription>
+              <CardTitle>Correction Results</CardTitle>
+              <CardDescription>Here is the AI-generated analysis.</CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading && (
@@ -149,23 +149,23 @@ export default function CorrectionAssistancePage() {
               )}
               {!isLoading && !correctionResult && (
                 <div className="flex flex-col items-center justify-center text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg h-96">
-                  <p>Les résultats de la correction apparaîtront ici.</p>
+                  <p>The correction results will appear here.</p>
                 </div>
               )}
               {correctionResult && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Devoir Corrigé</h3>
+                    <h3 className="text-lg font-semibold mb-2">Corrected Assignment</h3>
                     <p className="text-sm bg-secondary/50 p-4 rounded-md whitespace-pre-wrap">{correctionResult.correctedAssignment}</p>
                   </div>
                   <Separator />
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Erreurs Identifiées</h3>
+                    <h3 className="text-lg font-semibold mb-2">Identified Errors</h3>
                     <p className="text-sm bg-secondary/50 p-4 rounded-md whitespace-pre-wrap">{correctionResult.identifiedErrors}</p>
                   </div>
                   <Separator />
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Améliorations Suggérées</h3>
+                    <h3 className="text-lg font-semibold mb-2">Suggested Improvements</h3>
                     <p className="text-sm bg-secondary/50 p-4 rounded-md whitespace-pre-wrap">{correctionResult.suggestedImprovements}</p>
                   </div>
                 </div>

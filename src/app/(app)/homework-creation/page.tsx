@@ -17,12 +17,12 @@ import { Loader2, Printer, Copy } from 'lucide-react';
 import { PdfHeader } from '@/components/pdf-header';
 
 const formSchema = z.object({
-  topic: z.string().min(3, { message: 'Le sujet doit contenir au moins 3 caractères.' }),
+  topic: z.string().min(3, { message: 'Topic must be at least 3 characters.' }),
   skillLevel: z.enum(['beginner', 'intermediate', 'advanced']),
-  level: z.string({ required_error: 'Veuillez sélectionner un niveau.' }),
-  year: z.string({ required_error: 'Veuillez sélectionner une année.' }),
-  trimester: z.string({ required_error: 'Veuillez sélectionner un trimestre.' }),
-  quantity: z.coerce.number().int().min(1, { message: 'Doit être au moins 1.' }).max(10, { message: 'Ne peut pas dépasser 10.' }),
+  level: z.string({ required_error: 'Please select a level.' }),
+  year: z.string({ required_error: 'Please select a year.' }),
+  trimester: z.string({ required_error: 'Please select a trimester.' }),
+  quantity: z.coerce.number().int().min(1, { message: 'Must be at least 1.' }).max(10, { message: 'Cannot exceed 10.' }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -50,14 +50,14 @@ export default function HomeworkCreationPage() {
       const result = await generateHomeworkExercises(data as GenerateHomeworkExercisesInput);
       setGeneratedExercises(result.exercises);
       toast({
-        title: 'Succès !',
-        description: 'Vos exercices ont été générés.',
+        title: 'Success!',
+        description: 'Your exercises have been generated.',
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la génération des exercices. Veuillez réessayer.',
+        title: 'Error',
+        description: 'An error occurred while generating exercises. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -73,7 +73,7 @@ export default function HomeworkCreationPage() {
       const contentHTML = printContent.innerHTML;
       const printWindow = window.open('', '_blank');
       if (printWindow) {
-        printWindow.document.write(`<html><head><title>Imprimer les Devoirs</title>
+        printWindow.document.write(`<html><head><title>Print Homework</title>
         <style>
           body { font-family: 'PT Sans', sans-serif; }
           ol { list-style-type: decimal; padding-left: 20px; }
@@ -92,24 +92,24 @@ export default function HomeworkCreationPage() {
     const textToCopy = generatedExercises.map((ex, index) => `${index + 1}. ${ex}`).join('\n');
     navigator.clipboard.writeText(textToCopy);
     toast({
-      title: 'Copié !',
-      description: "Les exercices ont été copiés dans le presse-papiers.",
+      title: 'Copied!',
+      description: "The exercises have been copied to the clipboard.",
     });
   };
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Création de Devoirs"
-        description="Générez des devoirs à la maison adaptés au niveau de vos élèves."
+        title="Homework Creation"
+        description="Generate homework assignments tailored to your students' level."
       />
        <div className="hidden"><PdfHeader id="pdf-header-print" /></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
             <CardHeader>
-              <CardTitle>Paramètres des devoirs</CardTitle>
-              <CardDescription>Remplissez les détails pour générer les exercices.</CardDescription>
+              <CardTitle>Homework Parameters</CardTitle>
+              <CardDescription>Fill in the details to generate exercises.</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -119,9 +119,9 @@ export default function HomeworkCreationPage() {
                     name="topic"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Sujet</FormLabel>
+                        <FormLabel>Topic</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: Le subjonctif présent" {...field} />
+                          <Input placeholder="Ex: The present subjunctive" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -132,16 +132,16 @@ export default function HomeworkCreationPage() {
                       name="level"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Niveau</FormLabel>
+                          <FormLabel>Level</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Choisir le niveau" />
+                                  <SelectValue placeholder="Select level" />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                              <SelectItem value="Enseignement moyen">Enseignement moyen</SelectItem>
-                              <SelectItem value="Enseignement secondaire">Enseignement secondaire</SelectItem>
+                              <SelectItem value="Middle School">Middle School</SelectItem>
+                              <SelectItem value="High School">High School</SelectItem>
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -153,18 +153,18 @@ export default function HomeworkCreationPage() {
                       name="year"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Année</FormLabel>
+                          <FormLabel>Year</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Choisir l'année" />
+                                  <SelectValue placeholder="Select year" />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                  <SelectItem value="1ère année">1ère année</SelectItem>
-                                  <SelectItem value="2ème année">2ème année</SelectItem>
-                                  <SelectItem value="3ème année">3ème année</SelectItem>
-                                  {level === 'Enseignement moyen' && <SelectItem value="4ème année">4ème année (pour le moyen)</SelectItem>}
+                                  <SelectItem value="1st year">1st year</SelectItem>
+                                  <SelectItem value="2nd year">2nd year</SelectItem>
+                                  <SelectItem value="3rd year">3rd year</SelectItem>
+                                  {level === 'Middle School' && <SelectItem value="4th year">4th year (for middle school)</SelectItem>}
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -176,17 +176,17 @@ export default function HomeworkCreationPage() {
                       name="trimester"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Trimestre</FormLabel>
+                          <FormLabel>Trimester</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Choisir le trimestre" />
+                                  <SelectValue placeholder="Select trimester" />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                              <SelectItem value="1er trimestre">1er trimestre</SelectItem>
-                              <SelectItem value="2ème trimestre">2ème trimestre</SelectItem>
-                              <SelectItem value="3ème trimestre">3ème trimestre</SelectItem>
+                              <SelectItem value="1st trimester">1st trimester</SelectItem>
+                              <SelectItem value="2nd trimester">2nd trimester</SelectItem>
+                              <SelectItem value="3rd trimester">3rd trimester</SelectItem>
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -198,17 +198,17 @@ export default function HomeworkCreationPage() {
                     name="skillLevel"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Niveau de Compétence</FormLabel>
+                        <FormLabel>Skill Level</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Choisir un niveau" />
+                              <SelectValue placeholder="Select a level" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="beginner">Débutant</SelectItem>
-                            <SelectItem value="intermediate">Intermédiaire</SelectItem>
-                            <SelectItem value="advanced">Avancé</SelectItem>
+                            <SelectItem value="beginner">Beginner</SelectItem>
+                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="advanced">Advanced</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -220,7 +220,7 @@ export default function HomeworkCreationPage() {
                     name="quantity"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nombre d'exercices</FormLabel>
+                        <FormLabel>Number of exercises</FormLabel>
                         <FormControl>
                           <Input type="number" min="1" max="10" {...field} />
                         </FormControl>
@@ -230,7 +230,7 @@ export default function HomeworkCreationPage() {
                   />
                   <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Générer les exercices
+                    Generate Exercises
                   </Button>
                 </form>
               </Form>
@@ -240,8 +240,8 @@ export default function HomeworkCreationPage() {
         <div className="lg:col-span-2">
           <Card className="min-h-full">
             <CardHeader>
-              <CardTitle>Exercices générés</CardTitle>
-              <CardDescription>Voici les exercices de devoirs générés par l'IA.</CardDescription>
+              <CardTitle>Generated Exercises</CardTitle>
+              <CardDescription>Here are the AI-generated homework exercises.</CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading && (
@@ -251,7 +251,7 @@ export default function HomeworkCreationPage() {
               )}
               {!isLoading && generatedExercises.length === 0 && (
                 <div className="flex flex-col items-center justify-center text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg h-96">
-                  <p>Les exercices générés apparaîtront ici.</p>
+                  <p>Generated exercises will appear here.</p>
                 </div>
               )}
               {generatedExercises.length > 0 && (
@@ -264,8 +264,8 @@ export default function HomeworkCreationPage() {
                     </ol>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Imprimer</Button>
-                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> Copier</Button>
+                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Print</Button>
+                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> Copy</Button>
                   </div>
                 </div>
               )}
@@ -276,5 +276,3 @@ export default function HomeworkCreationPage() {
     </div>
   );
 }
-
-    

@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview Exam question suggestion flow for French teachers in Algeria.
+ * @fileOverview Exam question suggestion flow for English teachers in Algeria.
  *
  * - suggestExamQuestions - A function that suggests exam questions based on topic, difficulty, and curriculum.
  * - SuggestExamQuestionsInput - The input type for the suggestExamQuestions function.
@@ -55,11 +55,11 @@ const prompt = ai.definePrompt({
   name: 'suggestExamQuestionsPrompt',
   input: {schema: SuggestExamQuestionsInputSchema},
   output: {schema: SuggestExamQuestionsOutputSchema},
-  prompt: `You are an AI assistant designed to help French teachers in Algeria create complete exams based on the Algerian education system.
+  prompt: `You are an AI assistant designed to help English teachers in Algeria create complete exams based on the Algerian education system.
 
   Generate exactly {{numberOfSuggestions}} distinct exam suggestions.
 
-  The first suggestion should be a 'synthèse' (comprehensive composition) exam. This type of exam should be designed for students to write their answers on a separate paper. It should include a text for comprehension, followed by questions, grammar exercises, and a writing section ('production écrite').
+  The first suggestion should be a comprehensive composition exam. This type of exam should be designed for students to write their answers on a separate paper. It should include a text for comprehension, followed by questions, grammar exercises, and a writing section.
 
   The second suggestion should be an exam where students write their answers directly on the exam paper itself. This exam should be 2-3 pages long and must include ample empty space for answers after each question. It should also include tables for students to fill in.
 
@@ -83,14 +83,14 @@ const prompt = ai.definePrompt({
   {
     "suggestions": [
       {
-        "title": "Titre de l'examen de synthèse",
-        "examPaper": "## Épreuve de Synthèse\\n...",
-        "answerKey": "## Corrigé de l'Épreuve de Synthèse\\n..."
+        "title": "Title of the comprehensive exam",
+        "examPaper": "## Comprehensive Exam\\n...",
+        "answerKey": "## Answer Key for Comprehensive Exam\\n..."
       },
       {
-        "title": "Titre de l'examen à remplir",
-        "examPaper": "## Examen à Remplir\\n...",
-        "answerKey": "## Corrigé de l'Examen à Remplir\\n..."
+        "title": "Title of the fill-in-the-blank exam",
+        "examPaper": "## Fill-in-the-blank Exam\\n...",
+        "answerKey": "## Answer Key for Fill-in-the-blank Exam\\n..."
       }
     ]
   }

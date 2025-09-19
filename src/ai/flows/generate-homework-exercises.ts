@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for generating tailored homework exercises for French language teachers in Algeria.
+ * @fileOverview This file defines a Genkit flow for generating tailored homework exercises for English language teachers in Algeria.
  *
  * It includes:
  * - generateHomeworkExercises: The main function to generate homework exercises.
@@ -23,7 +23,7 @@ const GenerateHomeworkExercisesInputSchema = z.object({
   quantity: z.number().min(1).max(10).default(3).describe('The desired number of homework exercises.'),
   curriculumGuidelines: z
     .string()
-    .default('Algerian Ministry of Education French curriculum guidelines')
+    .default('Algerian Ministry of Education English curriculum guidelines')
     .describe('The curriculum guidelines to align the homework with.'),
 });
 export type GenerateHomeworkExercisesInput = z.infer<typeof GenerateHomeworkExercisesInputSchema>;
@@ -41,7 +41,7 @@ const prompt = ai.definePrompt({
   name: 'generateHomeworkExercisesPrompt',
   input: {schema: GenerateHomeworkExercisesInputSchema},
   output: {schema: GenerateHomeworkExercisesOutputSchema},
-  prompt: `You are an AI assistant designed to help French teachers in Algeria create homework exercises according to the Algerian education system.
+  prompt: `You are an AI assistant designed to help English teachers in Algeria create homework exercises according to the Algerian education system.
 
   Generate {{quantity}} homework exercises for the topic: {{topic}}.
   The exercises should be appropriate for students at the {{level}} level, in their {{year}}, during the {{trimester}}.

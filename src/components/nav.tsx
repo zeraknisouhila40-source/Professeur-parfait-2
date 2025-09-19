@@ -16,11 +16,11 @@ import {
 } from '@/components/ui/sidebar';
 
 const navItems = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Tableau de bord' },
-  { href: '/exam-suggestion', icon: FileText, label: "Suggestion d'Examen" },
-  { href: '/correction-assistance', icon: PenSquare, label: 'Aide à la Correction' },
-  { href: '/homework-creation', icon: BookMarked, label: 'Création de Devoirs' },
-  { href: '/lesson-planning', icon: CalendarCheck, label: 'Planification de Leçon' },
+  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { href: '/exam-suggestion', icon: FileText, label: "Exam Suggestion" },
+  { href: '/correction-assistance', icon: PenSquare, label: 'Correction Assistance' },
+  { href: '/homework-creation', icon: BookMarked, label: 'Homework Creation' },
+  { href: '/lesson-planning', icon: CalendarCheck, label: 'Lesson Planning' },
 ];
 
 export function Nav() {
