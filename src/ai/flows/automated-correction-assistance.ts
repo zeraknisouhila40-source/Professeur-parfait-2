@@ -7,16 +7,18 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import type {
+  CorrectAssignmentInput,
+  CorrectAssignmentOutput,
+} from './automated-correction-assistance-types';
 import {
   CorrectAssignmentInputSchema,
-  type CorrectAssignmentInput,
   CorrectAssignmentOutputSchema,
-  type CorrectAssignmentOutput,
 } from './automated-correction-assistance-types';
 
-
-export async function correctAssignment(input: CorrectAssignmentInput): Promise<CorrectAssignmentOutput> {
+export async function correctAssignment(
+  input: CorrectAssignmentInput
+): Promise<CorrectAssignmentOutput> {
   return correctAssignmentFlow(input);
 }
 
@@ -24,9 +26,7 @@ const prompt = ai.definePrompt({
   name: 'correctAssignmentPrompt',
   model: 'googleai/gemini-2.5-flash',
   input: {
-    schema: CorrectAssignmentInputSchema.extend({
-      isFrench: z.boolean(),
-    }),
+    schema: CorrectAssignmentInputSchema,
   },
   output: {schema: CorrectAssignmentOutputSchema},
   prompt: `You are an expert {{#if isFrench}}French{{else}}English{{/if}} teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.
@@ -51,9 +51,9 @@ const correctAssignmentFlow = ai.defineFlow(
     inputSchema: CorrectAssignmentInputSchema,
     outputSchema: CorrectAssignmentOutputSchema,
   },
-  async input => {
+  async (input) => {
     const isFrench = input.language === 'fr';
-    const {output} = await prompt({...input, isFrench});
+    const {output} = await prompt(input, {isFrench});
     return output!;
   }
 );

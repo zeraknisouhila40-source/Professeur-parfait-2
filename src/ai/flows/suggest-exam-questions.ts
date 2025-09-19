@@ -7,11 +7,13 @@
  */
 
 import {ai} from '@/ai/genkit';
+import type {
+  SuggestExamQuestionsInput,
+  SuggestExamQuestionsOutput,
+} from './suggest-exam-questions-types';
 import {
   SuggestExamQuestionsInputSchema,
-  type SuggestExamQuestionsInput,
   SuggestExamQuestionsOutputSchema,
-  type SuggestExamQuestionsOutput,
 } from './suggest-exam-questions-types';
 
 export async function suggestExamQuestions(
@@ -30,6 +32,7 @@ const prompt = ai.definePrompt({
 Generate exactly {{numberOfSuggestions}} distinct exam suggestions. Each suggestion must include a complete exam paper and a separate, detailed answer key. The difficulty and content must be perfectly adapted to the specified educational level, year, and trimester.
 
 **Educational Context:**
+*   **Language:** {{#if isFrench}}French{{else}}English{{/if}}
 *   **Level:** {{level}}
 *   **Year:** {{year}}
 *   **Trimester:** {{trimester}}
@@ -75,9 +78,9 @@ const suggestExamQuestionsFlow = ai.defineFlow(
     inputSchema: SuggestExamQuestionsInputSchema,
     outputSchema: SuggestExamQuestionsOutputSchema,
   },
-  async input => {
+  async (input) => {
     const isFrench = input.language === 'fr';
-    const {output} = await prompt({...input, isFrench});
+    const {output} = await prompt(input, {isFrench});
     return output!;
   }
 );

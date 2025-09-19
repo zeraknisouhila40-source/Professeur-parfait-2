@@ -8,15 +8,18 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import type {
+  GenerateHomeworkExercisesInput,
+  GenerateHomeworkExercisesOutput,
+} from './generate-homework-exercises-types';
 import {
   GenerateHomeworkExercisesInputSchema,
-  type GenerateHomeworkExercisesInput,
   GenerateHomeworkExercisesOutputSchema,
-  type GenerateHomeworkExercisesOutput,
 } from './generate-homework-exercises-types';
 
-export async function generateHomeworkExercises(input: GenerateHomeworkExercisesInput): Promise<GenerateHomeworkExercisesOutput> {
+export async function generateHomeworkExercises(
+  input: GenerateHomeworkExercisesInput
+): Promise<GenerateHomeworkExercisesOutput> {
   return generateHomeworkExercisesFlow(input);
 }
 
@@ -24,9 +27,7 @@ const prompt = ai.definePrompt({
   name: 'generateHomeworkExercisesPrompt',
   model: 'googleai/gemini-2.5-flash',
   input: {
-    schema: GenerateHomeworkExercisesInputSchema.extend({
-      isFrench: z.boolean(),
-    }),
+    schema: GenerateHomeworkExercisesInputSchema,
   },
   output: {schema: GenerateHomeworkExercisesOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create homework exercises according to the Algerian education system.
@@ -50,9 +51,9 @@ const generateHomeworkExercisesFlow = ai.defineFlow(
     inputSchema: GenerateHomeworkExercisesInputSchema,
     outputSchema: GenerateHomeworkExercisesOutputSchema,
   },
-  async input => {
+  async (input) => {
     const isFrench = input.language === 'fr';
-    const {output} = await prompt({...input, isFrench});
+    const {output} = await prompt(input, {isFrench});
     return output!;
   }
 );

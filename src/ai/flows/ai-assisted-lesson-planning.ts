@@ -10,12 +10,13 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import type {
+  AiAssistedLessonPlanningInput,
+  AiAssistedLessonPlanningOutput,
+} from './ai-assisted-lesson-planning-types';
 import {
   AiAssistedLessonPlanningInputSchema,
-  type AiAssistedLessonPlanningInput,
   AiAssistedLessonPlanningOutputSchema,
-  type AiAssistedLessonPlanningOutput,
 } from './ai-assisted-lesson-planning-types';
 
 export async function aiAssistedLessonPlanning(
@@ -27,11 +28,7 @@ export async function aiAssistedLessonPlanning(
 const prompt = ai.definePrompt({
   name: 'aiAssistedLessonPlanningPrompt',
   model: 'googleai/gemini-2.5-flash',
-  input: {
-    schema: AiAssistedLessonPlanningInputSchema.extend({
-      isFrench: z.boolean(),
-    }),
-  },
+  input: {schema: AiAssistedLessonPlanningInputSchema},
   output: {schema: AiAssistedLessonPlanningOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create high-quality, professional lesson plans that strictly adhere to the Algerian education system.
 
@@ -66,9 +63,9 @@ const aiAssistedLessonPlanningFlow = ai.defineFlow(
     inputSchema: AiAssistedLessonPlanningInputSchema,
     outputSchema: AiAssistedLessonPlanningOutputSchema,
   },
-  async input => {
+  async (input) => {
     const isFrench = input.language === 'fr';
-    const {output} = await prompt({...input, isFrench});
+    const {output} = await prompt(input, {isFrench});
     return output!;
   }
 );
