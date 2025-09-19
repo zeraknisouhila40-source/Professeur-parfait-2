@@ -101,7 +101,7 @@ const aiAssistedLessonPlanningFlow = ai.defineFlow(
   },
   async (input) => {
     const isFrench = input.language === 'fr';
-    const {output} = await prompt(input, {isFrench});
+    const {output} = await prompt({...input, isFrench});
     return output!;
   }
 );
