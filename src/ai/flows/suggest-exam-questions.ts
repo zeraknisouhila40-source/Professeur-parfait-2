@@ -31,6 +31,8 @@ const prompt = ai.definePrompt({
 
 Generate exactly {{numberOfSuggestions}} distinct exam suggestions. Each suggestion must include a complete exam paper and a separate, detailed answer key. The difficulty and content must be perfectly adapted to the specified educational level, year, and trimester.
 
+**Creativity Seed:** {{creativitySeed}} - Use this seed to ensure your response is unique and not a repeat of a previous answer.
+
 **Educational Context:**
 *   **Language:** {{#if isFrench}}French{{else}}English{{/if}}
 *   **Level:** {{level}}
@@ -80,7 +82,8 @@ const suggestExamQuestionsFlow = ai.defineFlow(
   },
   async (input) => {
     const isFrench = input.language === 'fr';
-    const {output} = await prompt(input, {isFrench});
+    const creativitySeed = Math.random();
+    const {output} = await prompt(input, {isFrench, creativitySeed});
     return output!;
   }
 );
