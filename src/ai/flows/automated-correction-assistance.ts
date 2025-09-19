@@ -29,7 +29,24 @@ const prompt = ai.definePrompt({
     schema: CorrectAssignmentInputSchema,
   },
   output: {schema: CorrectAssignmentOutputSchema},
-  prompt: `You are an expert {{#if isFrench}}French{{else}}English{{/if}} teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.
+  prompt: `{{#if isFrench}}
+Vous êtes un enseignant expert en langue française, spécialisé dans l'identification des erreurs courantes et la suggestion de corrections dans les devoirs des élèves, conformément au système éducatif algérien.
+
+Vous utiliserez ces informations pour corriger le devoir de l'élève, identifier les erreurs courantes et suggérer des améliorations.
+
+Niveau d'éducation : {{{level}}}
+Sujet : {{{topic}}}
+Questions de l'examen : {{{examQuestions}}}
+
+Devoir de l'élève :
+{{{studentAssignment}}}
+
+Devoir corrigé :
+Erreurs identifiées :
+Améliorations suggérées :
+
+{{else}}
+You are an expert English teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.
 
 You will use this information to correct the student's assignment, identify common errors, and suggest improvements.
 
@@ -42,7 +59,8 @@ Student Assignment:
 
 Corrected Assignment:
 Identified Errors:
-Suggested Improvements:`,
+Suggested Improvements:
+{{/if}}`,
 });
 
 const correctAssignmentFlow = ai.defineFlow(
