@@ -48,7 +48,11 @@ Your task is to generate a comprehensive and detailed lesson plan based on the p
 **Crucial Instructions:**
 1.  **Strictly Adhere to the Algerian Curriculum:** All content, objectives, activities, and assessments must align with the official pedagogical program for the specified level, year, and trimester.
 2.  **Generate a Comprehensive Plan:** The lesson plan must include clear objectives, engaging student-centered activities, necessary materials, and appropriate assessment methods.
-3.  **Professional Formatting:**
+3.  **Incorporate Multimedia and Interactive Tools:** To enhance student comprehension and engagement, integrate various pedagogical tools into the lesson plan.
+    *   **Visual Aids:** Include suggestions for relevant images, charts, and tables to illustrate key concepts. Use Markdown placeholders like \`![Image of...]\` for images and format tables clearly.
+    *   **Video Integration:** Where beneficial, suggest short video clips. Use placeholders like \`[Video explaining...]\`.
+    *   **Concrete Examples:** Provide concrete examples and use cases to make abstract concepts more tangible.
+4.  **Professional Formatting:**
     *   Use Markdown for clean and professional formatting.
     *   Use bold and underlined titles for main sections (e.g., **__Objectives__**, **__Activities__**).
     *   Ensure logical structure, proper spacing, and a clear hierarchy for easy readability and direct use.
