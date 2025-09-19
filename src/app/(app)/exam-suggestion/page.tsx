@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -56,7 +57,7 @@ export default function ExamSuggestionPage() {
     setIsLoading(true);
     setExamSuggestions([]);
     try {
-      const result = await suggestExamQuestions({ ...data, numberOfSuggestions: 2, language } as SuggestExamQuestionsInput);
+      const result = await suggestExamQuestions({ ...data, numberOfSuggestions: 2, language });
       setExamSuggestions(result.suggestions);
       toast({
         title: t('examSuggestion.toast.success.title'),
@@ -96,11 +97,8 @@ export default function ExamSuggestionPage() {
   const handleDownloadPdf = async (suggestion: ExamSuggestion, suggestionId: string) => {
     setIsDownloading(suggestionId);
     try {
-      const examPaperElement = document.getElementById(`exam-paper-${suggestionId}`);
-      const answerKeyElement = document.getElementById(`answer-key-${suggestionId}`);
       const headerElement = document.getElementById(`pdf-header-${suggestionId}`);
-
-      if (!examPaperElement || !answerKeyElement || !headerElement) {
+      if (!headerElement) {
         toast({ title: t('common.error.title'), description: t('examSuggestion.toast.pdfError'), variant: 'destructive' });
         setIsDownloading(null);
         return;
@@ -110,13 +108,14 @@ export default function ExamSuggestionPage() {
       const safeFont = 'Helvetica';
       pdf.setFont(safeFont);
 
-      const addContentToPdf = (element: HTMLElement, title: string, withHeader: boolean) => {
-        return new Promise<void>((resolve) => {
+      const addContentToPdf = (markdown: string, title: string, withHeader: boolean) => {
+        return new Promise<void>((resolve, reject) => {
+          const htmlContent = getHtml(markdown);
           const combinedHtml = `
             <div style="font-family: ${safeFont}; color: black; width: 525pt; padding: 35pt;">
               ${withHeader ? headerElement.innerHTML : ''}
               <h2>${title}</h2>
-              ${element.innerHTML}
+              <div class="prose prose-sm max-w-none">${htmlContent}</div>
             </div>
           `;
           pdf.html(combinedHtml, {
@@ -131,9 +130,9 @@ export default function ExamSuggestionPage() {
         });
       };
       
-      await addContentToPdf(examPaperElement, t('examSuggestion.results.tabs.examPaper'), true);
+      await addContentToPdf(suggestion.examPaper, t('examSuggestion.results.tabs.examPaper'), true);
       pdf.addPage();
-      await addContentToPdf(answerKeyElement, t('examSuggestion.results.tabs.answerKey'), false);
+      await addContentToPdf(suggestion.answerKey, t('examSuggestion.results.tabs.answerKey'), false);
       
       pdf.save(`${suggestion.title.replace(/ /g, '_')}.pdf`);
       
@@ -229,7 +228,6 @@ export default function ExamSuggestionPage() {
     );
   };
 
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -300,7 +298,7 @@ export default function ExamSuggestionPage() {
                                     <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder={t('common.trimester.placeholder')} />
-                                    </SelectTrigger>
+                                    </Trigger>
                                     </FormControl>
                                     <SelectContent>
                                     <SelectItem value="1st trimester">{t('common.trimester.1st')}</SelectItem>
