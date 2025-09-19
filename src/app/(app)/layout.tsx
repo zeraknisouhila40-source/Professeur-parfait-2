@@ -29,12 +29,19 @@ import { Pen } from 'lucide-react';
 function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const { t, language, setLanguage, teacherName, setTeacherName } = useTranslation();
   const [isEditingName, setIsEditingName] = useState(false);
-  const [name, setName] = useState(teacherName);
+  const [name, setName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setName(teacherName);
-  }, [teacherName]);
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if(isMounted) {
+      setName(teacherName);
+    }
+  }, [teacherName, isMounted]);
 
   useEffect(() => {
     if (isEditingName && inputRef.current) {
@@ -60,6 +67,10 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
       setIsEditingName(false);
     }
   };
+
+  if (!isMounted) {
+    return null; // or a loading skeleton
+  }
 
 
   return (
