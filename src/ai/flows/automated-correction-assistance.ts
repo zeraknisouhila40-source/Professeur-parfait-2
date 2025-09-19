@@ -4,39 +4,17 @@
  * @fileOverview An AI agent for providing automated assistance in correcting student assignments and exams.
  *
  * - correctAssignment - A function that handles the assignment correction process.
- * - CorrectAssignmentInput - The input type for the correctAssignment function.
- * - CorrectAssignmentOutput - The return type for the correctAssignment function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {
+  CorrectAssignmentInputSchema,
+  type CorrectAssignmentInput,
+  CorrectAssignmentOutputSchema,
+  type CorrectAssignmentOutput,
+} from './automated-correction-assistance-types';
 
-export const CorrectAssignmentInputSchema = z.object({
-  studentAssignment: z
-    .string()
-    .describe('The text of the student assignment.'),
-  examQuestions: z
-    .string()
-    .optional()
-    .describe('The exam questions that were given to the students.'),
-  topic: z.string().optional().describe('The topic of the assignment.'),
-  level: z.string().describe('The educational level of the students.'),
-  language: z.enum(['en', 'fr']).describe('The language of the assignment.'),
-});
-export type CorrectAssignmentInput = z.infer<typeof CorrectAssignmentInputSchema>;
-
-export const CorrectAssignmentOutputSchema = z.object({
-  correctedAssignment: z
-    .string()
-    .describe('The corrected version of the student assignment.'),
-  identifiedErrors: z
-    .string()
-    .describe('The common errors identified in the assignment.'),
-  suggestedImprovements: z
-    .string()
-    .describe('The suggested improvements for the student.'),
-});
-export type CorrectAssignmentOutput = z.infer<typeof CorrectAssignmentOutputSchema>;
 
 export async function correctAssignment(input: CorrectAssignmentInput): Promise<CorrectAssignmentOutput> {
   return correctAssignmentFlow(input);

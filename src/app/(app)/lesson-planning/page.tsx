@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { aiAssistedLessonPlanning, type AiAssistedLessonPlanningInput } from '@/ai/flows/ai-assisted-lesson-planning';
+import { aiAssistedLessonPlanning } from '@/ai/flows/ai-assisted-lesson-planning';
+import type { AiAssistedLessonPlanningInput } from '@/ai/flows/ai-assisted-lesson-planning-types';
 import jsPDF from 'jspdf';
 import { marked } from 'marked';
 import { useTranslation } from '@/hooks/use-translation';
@@ -110,11 +111,10 @@ export default function LessonPlanningPage() {
         callback: function (doc) {
           doc.save(`Lesson_Plan_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
         },
-        html2canvas: {
-          scale: 0.7
-        },
         autoPaging: 'text',
-        margin: [40, 40, 40, 40]
+        margin: [40, 40, 40, 40],
+        windowWidth: 700,
+        width: 525
       });
 
       toast({ title: t('lessonPlanning.toast.downloadSuccess.title'), description: t('lessonPlanning.toast.downloadSuccess.description') });

@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { suggestExamQuestions, type SuggestExamQuestionsInput, type SuggestExamQuestionsOutput } from '@/ai/flows/suggest-exam-questions';
+import { suggestExamQuestions } from '@/ai/flows/suggest-exam-questions';
+import type { SuggestExamQuestionsInput, SuggestExamQuestionsOutput } from '@/ai/flows/suggest-exam-questions-types';
 import { marked } from 'marked';
 import jsPDF from 'jspdf';
 import { useTranslation } from '@/hooks/use-translation';
@@ -110,9 +111,10 @@ export default function ExamSuggestionPage() {
         `;
         await pdf.html(combinedHtml, {
           callback: (doc) => {},
-          html2canvas: { scale: 0.7 },
           autoPaging: 'text',
-          margin: [40, 40, 40, 40]
+          margin: [40, 40, 40, 40],
+          windowWidth: 700,
+          width: 525
         });
       };
 

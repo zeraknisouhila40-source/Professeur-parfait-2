@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { correctAssignment, type CorrectAssignmentInput, type CorrectAssignmentOutput } from '@/ai/flows/automated-correction-assistance';
+import { correctAssignment } from '@/ai/flows/automated-correction-assistance';
+import type { CorrectAssignmentInput, CorrectAssignmentOutput } from '@/ai/flows/automated-correction-assistance-types';
 import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from '@/components/ui/button';

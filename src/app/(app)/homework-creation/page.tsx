@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { generateHomeworkExercises, type GenerateHomeworkExercisesInput } from '@/ai/flows/generate-homework-exercises';
+import { generateHomeworkExercises } from '@/ai/flows/generate-homework-exercises';
+import type { GenerateHomeworkExercisesInput } from '@/ai/flows/generate-homework-exercises-types';
 import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from '@/components/ui/button';
