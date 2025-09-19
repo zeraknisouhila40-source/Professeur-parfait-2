@@ -14,17 +14,19 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from '@/components/ui/sidebar';
+import { useTranslation } from '@/hooks/use-translation';
 
 const navItems = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/exam-suggestion', icon: FileText, label: "Exam Suggestion" },
-  { href: '/correction-assistance', icon: PenSquare, label: 'Correction Assistance' },
-  { href: '/homework-creation', icon: BookMarked, label: 'Homework Creation' },
-  { href: '/lesson-planning', icon: CalendarCheck, label: 'Lesson Planning' },
+  { href: '/dashboard', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
+  { href: '/exam-suggestion', icon: FileText, labelKey: 'nav.examSuggestion' },
+  { href: '/correction-assistance', icon: PenSquare, labelKey: 'nav.correctionAssistance' },
+  { href: '/homework-creation', icon: BookMarked, labelKey: 'nav.homeworkCreation' },
+  { href: '/lesson-planning', icon: CalendarCheck, labelKey: 'nav.lessonPlanning' },
 ];
 
 export function Nav() {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   return (
     <SidebarMenu>
@@ -33,11 +35,11 @@ export function Nav() {
           <SidebarMenuButton
             asChild
             isActive={pathname === item.href}
-            tooltip={item.label}
+            tooltip={t(item.labelKey)}
           >
             <Link href={item.href}>
               <item.icon />
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>

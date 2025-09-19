@@ -23,8 +23,9 @@ const GenerateHomeworkExercisesInputSchema = z.object({
   quantity: z.number().min(1).max(10).default(3).describe('The desired number of homework exercises.'),
   curriculumGuidelines: z
     .string()
-    .default('Algerian Ministry of Education English curriculum guidelines')
+    .default('Algerian Ministry of Education curriculum guidelines')
     .describe('The curriculum guidelines to align the homework with.'),
+    language: z.enum(['en', 'fr']).describe('The language for the exercises.'),
 });
 export type GenerateHomeworkExercisesInput = z.infer<typeof GenerateHomeworkExercisesInputSchema>;
 
@@ -41,7 +42,7 @@ const prompt = ai.definePrompt({
   name: 'generateHomeworkExercisesPrompt',
   input: {schema: GenerateHomeworkExercisesInputSchema},
   output: {schema: GenerateHomeworkExercisesOutputSchema},
-  prompt: `You are an AI assistant designed to help English teachers in Algeria create homework exercises according to the Algerian education system.
+  prompt: `You are an AI assistant designed to help {{language === 'fr' ? 'French' : 'English'}} teachers in Algeria create homework exercises according to the Algerian education system.
 
   Generate {{quantity}} homework exercises for the topic: {{topic}}.
   The exercises should be appropriate for students at the {{level}} level, in their {{year}}, during the {{trimester}}.

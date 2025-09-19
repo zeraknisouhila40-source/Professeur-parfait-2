@@ -1,0 +1,229 @@
+{
+  "common": {
+    "teacher": "Teacher",
+    "getStarted": "Get Started",
+    "print": "Print",
+    "copy": "Copy",
+    "copied": {
+      "title": "Copied!",
+      "description": "The content has been copied to the clipboard."
+    },
+    "error": {
+      "title": "Error",
+      "description": "An error occurred. Please try again."
+    },
+    "level": {
+      "label": "Level",
+      "placeholder": "Select level",
+      "middleSchool": "Middle School",
+      "highSchool": "High School",
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "elementary": "Elementary"
+    },
+    "year": {
+      "label": "Year",
+      "placeholder": "Select year",
+      "1st": "1st year",
+      "2nd": "2nd year",
+      "3rd": "3rd year",
+      "4th": "4th year (Middle School)"
+    },
+    "trimester": {
+      "label": "Trimester",
+      "placeholder": "Select trimester",
+      "1st": "1st trimester",
+      "2nd": "2nd trimester",
+      "3rd": "3rd trimester"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "examSuggestion": "Exam Suggestion",
+    "correctionAssistance": "Correction Assistance",
+    "homeworkCreation": "Homework Creation",
+    "lessonPlanning": "Lesson Planning"
+  },
+  "pdf": {
+    "header": {
+      "line1": "Algerian Democratic and People's Republic",
+      "line2": "Ministry of National Education"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "title": "Welcome, Professor!",
+      "description": "Perfect Professor is your AI assistant to simplify preparing your English classes."
+    },
+    "features": {
+      "examSuggestion": {
+        "title": "Exam Suggestion",
+        "description": "Generate exam questions based on specific topics, difficulties, and curricula."
+      },
+      "correctionAssistance": {
+        "title": "Correction Assistance",
+        "description": "Get automated assistance to correct homework and identify common errors."
+      },
+      "homeworkCreation": {
+        "title": "Homework Creation",
+        "description": "Create customized exercises tailored to different skill levels and topics."
+      },
+      "lessonPlanning": {
+        "title": "Lesson Planning",
+        "description": "Plan complete lessons with clear objectives, activities, and assessments."
+      }
+    }
+  },
+  "examSuggestion": {
+    "header": {
+      "title": "Exam Suggestion",
+      "description": "Generate complete, customized exams in seconds."
+    },
+    "form": {
+      "title": "Exam Parameters",
+      "description": "Fill in the details to generate suggestions.",
+      "topic": {
+        "label": "Topic (Optional)",
+        "placeholder": "Ex: The Algerian Revolution"
+      },
+      "keywords": {
+        "label": "Keywords (Optional)",
+        "placeholder": "Ex: History, Culture, Characters"
+      },
+      "numberOfQuestions": {
+        "label": "Number of questions"
+      },
+      "submit": "Generate Suggestions"
+    },
+    "results": {
+      "title": "Exam Suggestions",
+      "description": "Here are the AI-generated suggestions. Choose one.",
+      "placeholder1": "Exam suggestions will appear here.",
+      "placeholder2": "Fill out the form and click \"Generate\".",
+      "tabs": {
+        "examPaper": "Exam Paper",
+        "answerKey": "Answer Key"
+      },
+      "downloadPdf": "Download Subject & Key as PDF"
+    },
+    "toast": {
+      "success": {
+        "title": "Success!",
+        "description": "Your exam suggestions have been generated."
+      },
+      "pdfError": "Could not find exam content to generate the PDF.",
+      "downloadSuccess": {
+        "title": "Download Successful",
+        "description": "The exam PDF has been downloaded."
+      }
+    }
+  },
+  "correctionAssistance": {
+    "header": {
+      "title": "Correction Assistance",
+      "description": "Submit a student's work to get AI-assisted correction."
+    },
+    "form": {
+      "title": "Submit Assignment",
+      "description": "Provide the details of the assignment to be corrected.",
+      "studentAssignment": {
+        "label": "Student Assignment",
+        "placeholder": "Paste the student's assignment text here..."
+      },
+      "examQuestions": {
+        "label": "Exam Questions (Optional)",
+        "placeholder": "Enter the corresponding exam questions..."
+      },
+      "submit": "Correct Assignment"
+    },
+    "results": {
+      "title": "Correction Results",
+      "description": "Here is the AI-generated analysis.",
+      "placeholder": "The correction results will appear here.",
+      "correctedAssignment": "Corrected Assignment",
+      "identifiedErrors": "Identified Errors",
+      "suggestedImprovements": "Suggested Improvements"
+    },
+    "toast": {
+      "success": {
+        "title": "Correction Complete!",
+        "description": "The correction has been successfully generated."
+      }
+    }
+  },
+  "homeworkCreation": {
+    "header": {
+      "title": "Homework Creation",
+      "description": "Generate homework assignments tailored to your students' level."
+    },
+    "form": {
+      "title": "Homework Parameters",
+      "description": "Fill in the details to generate exercises.",
+      "topic": {
+        "label": "Topic",
+        "placeholder": "Ex: The present subjunctive"
+      },
+      "skillLevel": {
+        "label": "Skill Level",
+        "placeholder": "Select a level",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+      },
+      "quantity": {
+        "label": "Number of exercises"
+      },
+      "submit": "Generate Exercises"
+    },
+    "results": {
+      "title": "Generated Exercises",
+      "description": "Here are the AI-generated homework exercises.",
+      "placeholder": "Generated exercises will appear here."
+    },
+    "toast": {
+      "success": {
+        "title": "Success!",
+        "description": "Your exercises have been generated."
+      }
+    }
+  },
+  "lessonPlanning": {
+    "header": {
+      "title": "Lesson Planning",
+      "description": "Create detailed lesson plans with AI assistance."
+    },
+    "form": {
+      "title": "Lesson Parameters",
+      "description": "Fill in the details to generate the lesson plan.",
+      "topic": {
+        "label": "Lesson Topic",
+        "placeholder": "Ex: Imperfect and past tense"
+      },
+      "sessions": {
+        "label": "Number of sessions"
+      },
+      "prerequisites": {
+        "label": "Prerequisite Knowledge (Optional)",
+        "placeholder": "Describe what students already know..."
+      },
+      "submit": "Generate Lesson Plan"
+    },
+    "results": {
+      "title": "Generated Lesson Plan",
+      "description": "Here is the detailed AI-generated lesson plan.",
+      "placeholder": "The generated lesson plan will appear here.",
+      "downloadPdf": "Download as PDF"
+    },
+    "toast": {
+      "success": {
+        "title": "Success!",
+        "description": "Your lesson plan has been generated."
+      },
+      "pdfError": "Could not find lesson plan content to generate the PDF.",
+      "downloadSuccess": {
+        "title": "Download Successful",
+        "description": "The lesson plan PDF has been downloaded."
+      }
+    }
+  }
+}

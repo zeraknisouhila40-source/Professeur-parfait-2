@@ -5,6 +5,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { correctAssignment, type CorrectAssignmentInput, type CorrectAssignmentOutput } from '@/ai/flows/automated-correction-assistance';
+import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +27,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function CorrectionAssistancePage() {
+  const { t, language } = useTranslation();
   const [correctionResult, setCorrectionResult] = useState<CorrectAssignmentOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -44,17 +46,17 @@ export default function CorrectionAssistancePage() {
     setIsLoading(true);
     setCorrectionResult(null);
     try {
-      const result = await correctAssignment(data as CorrectAssignmentInput);
+      const result = await correctAssignment({ ...data, language } as CorrectAssignmentInput);
       setCorrectionResult(result);
       toast({
-        title: 'Correction Complete!',
-        description: 'The correction has been successfully generated.',
+        title: t('correctionAssistance.toast.success.title'),
+        description: t('correctionAssistance.toast.success.description'),
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Error',
-        description: 'An error occurred during correction. Please try again.',
+        title: t('common.error.title'),
+        description: t('common.error.description'),
         variant: 'destructive',
       });
     } finally {
@@ -65,15 +67,15 @@ export default function CorrectionAssistancePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Correction Assistance"
-        description="Submit a student's work to get AI-assisted correction."
+        title={t('correctionAssistance.header.title')}
+        description={t('correctionAssistance.header.description')}
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
             <CardHeader>
-              <CardTitle>Submit Assignment</CardTitle>
-              <CardDescription>Provide the details of the assignment to be corrected.</CardDescription>
+              <CardTitle>{t('correctionAssistance.form.title')}</CardTitle>
+              <CardDescription>{t('correctionAssistance.form.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -83,9 +85,9 @@ export default function CorrectionAssistancePage() {
                     name="studentAssignment"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Student Assignment</FormLabel>
+                        <FormLabel>{t('correctionAssistance.form.studentAssignment.label')}</FormLabel>
                         <FormControl>
-                          <Textarea rows={8} placeholder="Paste the student's assignment text here..." {...field} />
+                          <Textarea rows={8} placeholder={t('correctionAssistance.form.studentAssignment.placeholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -96,17 +98,17 @@ export default function CorrectionAssistancePage() {
                     name="level"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Educational Level</FormLabel>
+                        <FormLabel>{t('common.level.label')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a level" />
+                              <SelectValue placeholder={t('common.level.placeholder')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="primary">Primary</SelectItem>
-                            <SelectItem value="secondary">Secondary</SelectItem>
-                            <SelectItem value="elementary">Elementary</SelectItem>
+                            <SelectItem value="primary">{t('common.level.primary')}</SelectItem>
+                            <SelectItem value="secondary">{t('common.level.secondary')}</SelectItem>
+                            <SelectItem value="elementary">{t('common.level.elementary')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -118,9 +120,9 @@ export default function CorrectionAssistancePage() {
                     name="examQuestions"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Exam Questions (Optional)</FormLabel>
+                        <FormLabel>{t('correctionAssistance.form.examQuestions.label')}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Enter the corresponding exam questions..." {...field} />
+                          <Textarea placeholder={t('correctionAssistance.form.examQuestions.placeholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -128,7 +130,7 @@ export default function CorrectionAssistancePage() {
                   />
                   <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Correct Assignment
+                    {t('correctionAssistance.form.submit')}
                   </Button>
                 </form>
               </Form>
@@ -138,8 +140,8 @@ export default function CorrectionAssistancePage() {
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Correction Results</CardTitle>
-              <CardDescription>Here is the AI-generated analysis.</CardDescription>
+              <CardTitle>{t('correctionAssistance.results.title')}</CardTitle>
+              <CardDescription>{t('correctionAssistance.results.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading && (
@@ -149,23 +151,23 @@ export default function CorrectionAssistancePage() {
               )}
               {!isLoading && !correctionResult && (
                 <div className="flex flex-col items-center justify-center text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg h-96">
-                  <p>The correction results will appear here.</p>
+                  <p>{t('correctionAssistance.results.placeholder')}</p>
                 </div>
               )}
               {correctionResult && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Corrected Assignment</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('correctionAssistance.results.correctedAssignment')}</h3>
                     <p className="text-sm bg-secondary/50 p-4 rounded-md whitespace-pre-wrap">{correctionResult.correctedAssignment}</p>
                   </div>
                   <Separator />
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Identified Errors</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('correctionAssistance.results.identifiedErrors')}</h3>
                     <p className="text-sm bg-secondary/50 p-4 rounded-md whitespace-pre-wrap">{correctionResult.identifiedErrors}</p>
                   </div>
                   <Separator />
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Suggested Improvements</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('correctionAssistance.results.suggestedImprovements')}</h3>
                     <p className="text-sm bg-secondary/50 p-4 rounded-md whitespace-pre-wrap">{correctionResult.suggestedImprovements}</p>
                   </div>
                 </div>

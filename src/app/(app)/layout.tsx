@@ -1,3 +1,4 @@
+'use client';
 import { Nav } from '@/components/nav';
 import {
   SidebarProvider,
@@ -12,8 +13,18 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Image from 'next/image';
+import { useTranslation, LanguageProvider } from '@/hooks/use-translation';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+function AppLayoutContent({ children }: { children: React.ReactNode }) {
+  const { t, language, setLanguage } = useTranslation();
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -35,8 +46,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <AvatarFallback>PP</AvatarFallback>
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <span className="text-sm font-medium">Teacher</span>
-              <span className="text-xs text-muted-foreground">English</span>
+              <span className="text-sm font-medium">{t('common.teacher')}</span>
+              <Select
+                value={language}
+                onValueChange={(value) => setLanguage(value as 'en' | 'fr')}
+              >
+                <SelectTrigger className="border-none p-0 h-auto focus:ring-0 focus:ring-offset-0 text-xs text-muted-foreground">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </SidebarFooter>
@@ -52,4 +74,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </SidebarInset>
     </SidebarProvider>
   );
+}
+
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <LanguageProvider>
+      <AppLayoutContent>{children}</AppLayoutContent>
+    </LanguageProvider>
+  )
 }

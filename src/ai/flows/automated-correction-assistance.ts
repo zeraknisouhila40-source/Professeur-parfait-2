@@ -14,7 +14,7 @@ import {z} from 'genkit';
 const CorrectAssignmentInputSchema = z.object({
   studentAssignment: z
     .string()
-    .describe('The text of the student assignment in English.'),
+    .describe('The text of the student assignment.'),
   examQuestions: z
     .string()
     .optional()
@@ -23,6 +23,7 @@ const CorrectAssignmentInputSchema = z.object({
   level: z
     .enum(['primary', 'secondary', 'elementary'])
     .describe('The educational level of the students.'),
+  language: z.enum(['en', 'fr']).describe('The language of the assignment.'),
 });
 export type CorrectAssignmentInput = z.infer<typeof CorrectAssignmentInputSchema>;
 
@@ -47,7 +48,7 @@ const prompt = ai.definePrompt({
   name: 'correctAssignmentPrompt',
   input: {schema: CorrectAssignmentInputSchema},
   output: {schema: CorrectAssignmentOutputSchema},
-  prompt: `You are an expert English teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.
+  prompt: `You are an expert {{language === 'fr' ? 'French' : 'English'}} teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.
 
 You will use this information to correct the student's assignment, identify common errors, and suggest improvements.
 

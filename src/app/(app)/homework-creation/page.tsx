@@ -5,6 +5,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { generateHomeworkExercises, type GenerateHomeworkExercisesInput } from '@/ai/flows/generate-homework-exercises';
+import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +29,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function HomeworkCreationPage() {
+  const { t, language } = useTranslation();
   const [generatedExercises, setGeneratedExercises] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -41,23 +43,23 @@ export default function HomeworkCreationPage() {
     },
   });
   
-  const level = form.watch('level');
+  const levelValue = form.watch('level');
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
     setGeneratedExercises([]);
     try {
-      const result = await generateHomeworkExercises(data as GenerateHomeworkExercisesInput);
+      const result = await generateHomeworkExercises({ ...data, language } as GenerateHomeworkExercisesInput);
       setGeneratedExercises(result.exercises);
       toast({
-        title: 'Success!',
-        description: 'Your exercises have been generated.',
+        title: t('homeworkCreation.toast.success.title'),
+        description: t('homeworkCreation.toast.success.description'),
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Error',
-        description: 'An error occurred while generating exercises. Please try again.',
+        title: t('common.error.title'),
+        description: t('common.error.description'),
         variant: 'destructive',
       });
     } finally {
@@ -92,24 +94,24 @@ export default function HomeworkCreationPage() {
     const textToCopy = generatedExercises.map((ex, index) => `${index + 1}. ${ex}`).join('\n');
     navigator.clipboard.writeText(textToCopy);
     toast({
-      title: 'Copied!',
-      description: "The exercises have been copied to the clipboard.",
+      title: t('common.copied.title'),
+      description: t('common.copied.description'),
     });
   };
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Homework Creation"
-        description="Generate homework assignments tailored to your students' level."
+        title={t('homeworkCreation.header.title')}
+        description={t('homeworkCreation.header.description')}
       />
        <div className="hidden"><PdfHeader id="pdf-header-print" /></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
             <CardHeader>
-              <CardTitle>Homework Parameters</CardTitle>
-              <CardDescription>Fill in the details to generate exercises.</CardDescription>
+              <CardTitle>{t('homeworkCreation.form.title')}</CardTitle>
+              <CardDescription>{t('homeworkCreation.form.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -119,9 +121,9 @@ export default function HomeworkCreationPage() {
                     name="topic"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Topic</FormLabel>
+                        <FormLabel>{t('homeworkCreation.form.topic.label')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: The present subjunctive" {...field} />
+                          <Input placeholder={t('homeworkCreation.form.topic.placeholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -132,16 +134,16 @@ export default function HomeworkCreationPage() {
                       name="level"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Level</FormLabel>
+                          <FormLabel>{t('common.level.label')}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Select level" />
+                                  <SelectValue placeholder={t('common.level.placeholder')} />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                              <SelectItem value="Middle School">Middle School</SelectItem>
-                              <SelectItem value="High School">High School</SelectItem>
+                                <SelectItem value="Middle School">{t('common.level.middleSchool')}</SelectItem>
+                                <SelectItem value="High School">{t('common.level.highSchool')}</SelectItem>
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -153,18 +155,18 @@ export default function HomeworkCreationPage() {
                       name="year"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Year</FormLabel>
+                          <FormLabel>{t('common.year.label')}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Select year" />
+                                  <SelectValue placeholder={t('common.year.placeholder')} />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                  <SelectItem value="1st year">1st year</SelectItem>
-                                  <SelectItem value="2nd year">2nd year</SelectItem>
-                                  <SelectItem value="3rd year">3rd year</SelectItem>
-                                  {level === 'Middle School' && <SelectItem value="4th year">4th year (for middle school)</SelectItem>}
+                                  <SelectItem value="1st year">{t('common.year.1st')}</SelectItem>
+                                  <SelectItem value="2nd year">{t('common.year.2nd')}</SelectItem>
+                                  <SelectItem value="3rd year">{t('common.year.3rd')}</SelectItem>
+                                  {levelValue === 'Middle School' && <SelectItem value="4th year">{t('common.year.4th')}</SelectItem>}
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -176,17 +178,17 @@ export default function HomeworkCreationPage() {
                       name="trimester"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Trimester</FormLabel>
+                          <FormLabel>{t('common.trimester.label')}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Select trimester" />
+                                  <SelectValue placeholder={t('common.trimester.placeholder')} />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                              <SelectItem value="1st trimester">1st trimester</SelectItem>
-                              <SelectItem value="2nd trimester">2nd trimester</SelectItem>
-                              <SelectItem value="3rd trimester">3rd trimester</SelectItem>
+                                <SelectItem value="1st trimester">{t('common.trimester.1st')}</SelectItem>
+                                <SelectItem value="2nd trimester">{t('common.trimester.2nd')}</SelectItem>
+                                <SelectItem value="3rd trimester">{t('common.trimester.3rd')}</SelectItem>
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -198,17 +200,17 @@ export default function HomeworkCreationPage() {
                     name="skillLevel"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Skill Level</FormLabel>
+                        <FormLabel>{t('homeworkCreation.form.skillLevel.label')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a level" />
+                              <SelectValue placeholder={t('homeworkCreation.form.skillLevel.placeholder')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="beginner">Beginner</SelectItem>
-                            <SelectItem value="intermediate">Intermediate</SelectItem>
-                            <SelectItem value="advanced">Advanced</SelectItem>
+                            <SelectItem value="beginner">{t('homeworkCreation.form.skillLevel.beginner')}</SelectItem>
+                            <SelectItem value="intermediate">{t('homeworkCreation.form.skillLevel.intermediate')}</SelectItem>
+                            <SelectItem value="advanced">{t('homeworkCreation.form.skillLevel.advanced')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -220,7 +222,7 @@ export default function HomeworkCreationPage() {
                     name="quantity"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Number of exercises</FormLabel>
+                        <FormLabel>{t('homeworkCreation.form.quantity.label')}</FormLabel>
                         <FormControl>
                           <Input type="number" min="1" max="10" {...field} />
                         </FormControl>
@@ -230,7 +232,7 @@ export default function HomeworkCreationPage() {
                   />
                   <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Generate Exercises
+                    {t('homeworkCreation.form.submit')}
                   </Button>
                 </form>
               </Form>
@@ -240,8 +242,8 @@ export default function HomeworkCreationPage() {
         <div className="lg:col-span-2">
           <Card className="min-h-full">
             <CardHeader>
-              <CardTitle>Generated Exercises</CardTitle>
-              <CardDescription>Here are the AI-generated homework exercises.</CardDescription>
+              <CardTitle>{t('homeworkCreation.results.title')}</CardTitle>
+              <CardDescription>{t('homeworkCreation.results.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading && (
@@ -251,7 +253,7 @@ export default function HomeworkCreationPage() {
               )}
               {!isLoading && generatedExercises.length === 0 && (
                 <div className="flex flex-col items-center justify-center text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg h-96">
-                  <p>Generated exercises will appear here.</p>
+                  <p>{t('homeworkCreation.results.placeholder')}</p>
                 </div>
               )}
               {generatedExercises.length > 0 && (
@@ -264,8 +266,8 @@ export default function HomeworkCreationPage() {
                     </ol>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Print</Button>
-                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> Copy</Button>
+                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> {t('common.print')}</Button>
+                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> {t('common.copy')}</Button>
                   </div>
                 </div>
               )}

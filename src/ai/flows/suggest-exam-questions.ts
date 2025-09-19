@@ -25,6 +25,7 @@ const SuggestExamQuestionsInputSchema = z.object({
     .default(5)
     .describe('The number of exam questions to generate (up to 10).'),
   numberOfSuggestions: z.number().int().min(1).max(5).default(2).describe('The number of exam suggestions to generate.'),
+  language: z.enum(['en', 'fr']).describe('The language for the exam.'),
 });
 export type SuggestExamQuestionsInput = z.infer<
   typeof SuggestExamQuestionsInputSchema
@@ -55,7 +56,7 @@ const prompt = ai.definePrompt({
   name: 'suggestExamQuestionsPrompt',
   input: {schema: SuggestExamQuestionsInputSchema},
   output: {schema: SuggestExamQuestionsOutputSchema},
-  prompt: `You are an AI assistant designed to help English teachers in Algeria create complete exams based on the Algerian education system.
+  prompt: `You are an AI assistant designed to help {{language === 'fr' ? 'French' : 'English'}} teachers in Algeria create complete exams based on the Algerian education system.
 
   Generate exactly {{numberOfSuggestions}} distinct exam suggestions.
 

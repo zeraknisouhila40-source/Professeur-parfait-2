@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { aiAssistedLessonPlanning, type AiAssistedLessonPlanningInput } from '@/ai/flows/ai-assisted-lesson-planning';
 import jsPDF from 'jspdf';
 import { marked } from 'marked';
+import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,6 +33,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function LessonPlanningPage() {
+  const { t, language } = useTranslation();
   const [lessonPlan, setLessonPlan] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -46,23 +48,23 @@ export default function LessonPlanningPage() {
     },
   });
 
-  const level = form.watch('level');
+  const levelValue = form.watch('level');
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
     setLessonPlan(null);
     try {
-      const result = await aiAssistedLessonPlanning(data as AiAssistedLessonPlanningInput);
+      const result = await aiAssistedLessonPlanning({ ...data, language } as AiAssistedLessonPlanningInput);
       setLessonPlan(result.lessonPlan);
       toast({
-        title: 'Success!',
-        description: 'Your lesson plan has been generated.',
+        title: t('lessonPlanning.toast.success.title'),
+        description: t('lessonPlanning.toast.success.description'),
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Error',
-        description: 'An error occurred while generating the lesson plan. Please try again.',
+        title: t('common.error.title'),
+        description: t('common.error.description'),
         variant: 'destructive',
       });
     } finally {
@@ -88,7 +90,7 @@ export default function LessonPlanningPage() {
       const headerElement = document.getElementById('pdf-header-lesson');
 
       if (!lessonPlanElement || !headerElement) {
-        toast({ title: 'Error', description: "Could not find lesson plan content.", variant: 'destructive' });
+        toast({ title: t('common.error.title'), description: t('lessonPlanning.toast.pdfError'), variant: 'destructive' });
         setIsDownloading(false);
         return;
       }
@@ -112,10 +114,10 @@ export default function LessonPlanningPage() {
         autoPaging: 'text',
       });
 
-      toast({ title: 'Download Successful', description: 'The lesson plan PDF has been downloaded.' });
+      toast({ title: t('lessonPlanning.toast.downloadSuccess.title'), description: t('lessonPlanning.toast.downloadSuccess.description') });
     } catch (error) {
       console.error('Error generating PDF:', error);
-      toast({ title: 'Download Error', description: 'An error occurred while creating the PDF.', variant: 'destructive' });
+      toast({ title: t('lessonPlanning.toast.pdfError'), description: String(error), variant: 'destructive' });
     } finally {
       setIsDownloading(false);
     }
@@ -148,8 +150,8 @@ export default function LessonPlanningPage() {
     if (lessonPlan) {
       navigator.clipboard.writeText(lessonPlan);
       toast({
-        title: 'Copied!',
-        description: "The lesson plan has been copied to the clipboard.",
+        title: t('common.copied.title'),
+        description: t('common.copied.description'),
       });
     }
   };
@@ -161,15 +163,15 @@ export default function LessonPlanningPage() {
         <PdfHeader id="pdf-header-lesson" />
       </div>
       <PageHeader
-        title="Lesson Planning"
-        description="Create detailed lesson plans with AI assistance."
+        title={t('lessonPlanning.header.title')}
+        description={t('lessonPlanning.header.description')}
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
             <CardHeader>
-              <CardTitle>Lesson Parameters</CardTitle>
-              <CardDescription>Fill in the details to generate the lesson plan.</CardDescription>
+              <CardTitle>{t('lessonPlanning.form.title')}</CardTitle>
+              <CardDescription>{t('lessonPlanning.form.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -179,9 +181,9 @@ export default function LessonPlanningPage() {
                     name="topic"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Lesson Topic</FormLabel>
+                        <FormLabel>{t('lessonPlanning.form.topic.label')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Ex: Imperfect and past tense" {...field} />
+                          <Input placeholder={t('lessonPlanning.form.topic.placeholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -192,16 +194,16 @@ export default function LessonPlanningPage() {
                       name="level"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Level</FormLabel>
+                          <FormLabel>{t('common.level.label')}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Select level" />
+                                  <SelectValue placeholder={t('common.level.placeholder')} />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                              <SelectItem value="Middle School">Middle School</SelectItem>
-                              <SelectItem value="High School">High School</SelectItem>
+                                <SelectItem value="Middle School">{t('common.level.middleSchool')}</SelectItem>
+                                <SelectItem value="High School">{t('common.level.highSchool')}</SelectItem>
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -213,18 +215,18 @@ export default function LessonPlanningPage() {
                       name="year"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Year</FormLabel>
+                          <FormLabel>{t('common.year.label')}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Select year" />
+                                  <SelectValue placeholder={t('common.year.placeholder')} />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                  <SelectItem value="1st year">1st year</SelectItem>
-                                  <SelectItem value="2nd year">2nd year</SelectItem>
-                                  <SelectItem value="3rd year">3rd year</SelectItem>
-                                  {level === 'Middle School' && <SelectItem value="4th year">4th year (for middle school)</SelectItem>}
+                                  <SelectItem value="1st year">{t('common.year.1st')}</SelectItem>
+                                  <SelectItem value="2nd year">{t('common.year.2nd')}</SelectItem>
+                                  <SelectItem value="3rd year">{t('common.year.3rd')}</SelectItem>
+                                  {levelValue === 'Middle School' && <SelectItem value="4th year">{t('common.year.4th')}</SelectItem>}
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -236,17 +238,17 @@ export default function LessonPlanningPage() {
                       name="trimester"
                       render={({ field }) => (
                           <FormItem>
-                          <FormLabel>Trimester</FormLabel>
+                          <FormLabel>{t('common.trimester.label')}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                               <SelectTrigger>
-                                  <SelectValue placeholder="Select trimester" />
+                                  <SelectValue placeholder={t('common.trimester.placeholder')} />
                               </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                              <SelectItem value="1st trimester">1st trimester</SelectItem>
-                              <SelectItem value="2nd trimester">2nd trimester</SelectItem>
-                              <SelectItem value="3rd trimester">3rd trimester</SelectItem>
+                                <SelectItem value="1st trimester">{t('common.trimester.1st')}</SelectItem>
+                                <SelectItem value="2nd trimester">{t('common.trimester.2nd')}</SelectItem>
+                                <SelectItem value="3rd trimester">{t('common.trimester.3rd')}</SelectItem>
                               </SelectContent>
                           </Select>
                           <FormMessage />
@@ -258,7 +260,7 @@ export default function LessonPlanningPage() {
                     name="numberOfClassMeetings"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Number of sessions</FormLabel>
+                        <FormLabel>{t('lessonPlanning.form.sessions.label')}</FormLabel>
                         <FormControl>
                           <Input type="number" min="1" max="20" {...field} />
                         </FormControl>
@@ -271,9 +273,9 @@ export default function LessonPlanningPage() {
                     name="prerequisiteKnowledge"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Prerequisite Knowledge (Optional)</FormLabel>
+                        <FormLabel>{t('lessonPlanning.form.prerequisites.label')}</FormLabel>
                         <FormControl>
-                          <Textarea rows={4} placeholder="Describe what students already know..." {...field} />
+                          <Textarea rows={4} placeholder={t('lessonPlanning.form.prerequisites.placeholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -281,7 +283,7 @@ export default function LessonPlanningPage() {
                   />
                   <Button type="submit" disabled={isLoading} className="w-full">
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Generate Lesson Plan
+                    {t('lessonPlanning.form.submit')}
                   </Button>
                 </form>
               </Form>
@@ -291,8 +293,8 @@ export default function LessonPlanningPage() {
         <div className="lg:col-span-2">
           <Card className="min-h-full">
             <CardHeader>
-              <CardTitle>Generated Lesson Plan</CardTitle>
-              <CardDescription>Here is the detailed AI-generated lesson plan.</CardDescription>
+              <CardTitle>{t('lessonPlanning.results.title')}</CardTitle>
+              <CardDescription>{t('lessonPlanning.results.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading && (
@@ -302,7 +304,7 @@ export default function LessonPlanningPage() {
               )}
               {!isLoading && !lessonPlan && (
                 <div className="flex flex-col items-center justify-center text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg h-96">
-                  <p>The generated lesson plan will appear here.</p>
+                  <p>{t('lessonPlanning.results.placeholder')}</p>
                 </div>
               )}
               {lessonPlan && (
@@ -318,10 +320,10 @@ export default function LessonPlanningPage() {
                       ) : (
                         <Download className="mr-2 h-4 w-4" />
                       )}
-                      Download as PDF
+                      {t('lessonPlanning.results.downloadPdf')}
                     </Button>
-                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Print</Button>
-                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> Copy</Button>
+                    <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> {t('common.print')}</Button>
+                    <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> {t('common.copy')}</Button>
                   </div>
                 </div>
               )}

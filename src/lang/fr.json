@@ -1,0 +1,229 @@
+{
+  "common": {
+    "teacher": "Professeur",
+    "getStarted": "Commencer",
+    "print": "Imprimer",
+    "copy": "Copier",
+    "copied": {
+      "title": "Copié !",
+      "description": "Le contenu a été copié dans le presse-papiers."
+    },
+    "error": {
+      "title": "Erreur",
+      "description": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "level": {
+      "label": "Niveau",
+      "placeholder": "Sélectionner le niveau",
+      "middleSchool": "Collège",
+      "highSchool": "Lycée",
+      "primary": "Primaire",
+      "secondary": "Secondaire",
+      "elementary": "Élémentaire"
+    },
+    "year": {
+      "label": "Année",
+      "placeholder": "Sélectionner l'année",
+      "1st": "1ère année",
+      "2nd": "2ème année",
+      "3rd": "3ème année",
+      "4th": "4ème année (Collège)"
+    },
+    "trimester": {
+      "label": "Trimestre",
+      "placeholder": "Sélectionner le trimestre",
+      "1st": "1er trimestre",
+      "2nd": "2ème trimestre",
+      "3rd": "3ème trimestre"
+    }
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "examSuggestion": "Suggestion d'Examen",
+    "correctionAssistance": "Aide à la Correction",
+    "homeworkCreation": "Création de Devoirs",
+    "lessonPlanning": "Planification de Leçon"
+  },
+  "pdf": {
+    "header": {
+      "line1": "République Algérienne Démocratique et Populaire",
+      "line2": "Ministère de l'Éducation Nationale"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "title": "Bienvenue, Professeur !",
+      "description": "Perfect Professor est votre assistant IA pour simplifier la préparation de vos cours de français."
+    },
+    "features": {
+      "examSuggestion": {
+        "title": "Suggestion d'Examen",
+        "description": "Générez des questions d'examen basées sur des sujets, difficultés et programmes spécifiques."
+      },
+      "correctionAssistance": {
+        "title": "Aide à la Correction",
+        "description": "Obtenez une aide automatisée pour corriger les devoirs et identifier les erreurs courantes."
+      },
+      "homeworkCreation": {
+        "title": "Création de Devoirs",
+        "description": "Créez des exercices personnalisés adaptés à différents niveaux de compétence et sujets."
+      },
+      "lessonPlanning": {
+        "title": "Planification de Leçon",
+        "description": "Planifiez des leçons complètes avec des objectifs clairs, des activités et des évaluations."
+      }
+    }
+  },
+  "examSuggestion": {
+    "header": {
+      "title": "Suggestion d'Examen",
+      "description": "Générez des examens complets et personnalisés en quelques secondes."
+    },
+    "form": {
+      "title": "Paramètres de l'Examen",
+      "description": "Remplissez les détails pour générer des suggestions.",
+      "topic": {
+        "label": "Sujet (Optionnel)",
+        "placeholder": "Ex: La Révolution Algérienne"
+      },
+      "keywords": {
+        "label": "Mots-clés (Optionnel)",
+        "placeholder": "Ex: Histoire, Culture, Personnages"
+      },
+      "numberOfQuestions": {
+        "label": "Nombre de questions"
+      },
+      "submit": "Générer des Suggestions"
+    },
+    "results": {
+      "title": "Suggestions d'Examen",
+      "description": "Voici les suggestions générées par l'IA. Choisissez-en une.",
+      "placeholder1": "Les suggestions d'examen apparaîtront ici.",
+      "placeholder2": "Remplissez le formulaire et cliquez sur \"Générer\".",
+      "tabs": {
+        "examPaper": "Sujet d'Examen",
+        "answerKey": "Corrigé"
+      },
+      "downloadPdf": "Télécharger le Sujet et le Corrigé en PDF"
+    },
+    "toast": {
+      "success": {
+        "title": "Succès !",
+        "description": "Vos suggestions d'examen ont été générées."
+      },
+      "pdfError": "Impossible de trouver le contenu de l'examen pour générer le PDF.",
+      "downloadSuccess": {
+        "title": "Téléchargement Réussi",
+        "description": "Le PDF de l'examen a été téléchargé."
+      }
+    }
+  },
+  "correctionAssistance": {
+    "header": {
+      "title": "Aide à la Correction",
+      "description": "Soumettez le travail d'un élève pour obtenir une correction assistée par l'IA."
+    },
+    "form": {
+      "title": "Soumettre un Devoir",
+      "description": "Fournissez les détails du devoir à corriger.",
+      "studentAssignment": {
+        "label": "Devoir de l'élève",
+        "placeholder": "Collez le texte du devoir de l'élève ici..."
+      },
+      "examQuestions": {
+        "label": "Questions d'Examen (Optionnel)",
+        "placeholder": "Entrez les questions d'examen correspondantes..."
+      },
+      "submit": "Corriger le Devoir"
+    },
+    "results": {
+      "title": "Résultats de la Correction",
+      "description": "Voici l'analyse générée par l'IA.",
+      "placeholder": "Les résultats de la correction apparaîtront ici.",
+      "correctedAssignment": "Devoir Corrigé",
+      "identifiedErrors": "Erreurs Identifiées",
+      "suggestedImprovements": "Améliorations Suggérées"
+    },
+    "toast": {
+      "success": {
+        "title": "Correction Terminée !",
+        "description": "La correction a été générée avec succès."
+      }
+    }
+  },
+  "homeworkCreation": {
+    "header": {
+      "title": "Création de Devoirs",
+      "description": "Générez des devoirs adaptés au niveau de vos élèves."
+    },
+    "form": {
+      "title": "Paramètres des Devoirs",
+      "description": "Remplissez les détails pour générer des exercices.",
+      "topic": {
+        "label": "Sujet",
+        "placeholder": "Ex: Le subjonctif présent"
+      },
+      "skillLevel": {
+        "label": "Niveau de Compétence",
+        "placeholder": "Sélectionner un niveau",
+        "beginner": "Débutant",
+        "intermediate": "Intermédiaire",
+        "advanced": "Avancé"
+      },
+      "quantity": {
+        "label": "Nombre d'exercices"
+      },
+      "submit": "Générer les Exercices"
+    },
+    "results": {
+      "title": "Exercices Générés",
+      "description": "Voici les exercices de devoirs générés par l'IA.",
+      "placeholder": "Les exercices générés apparaîtront ici."
+    },
+    "toast": {
+      "success": {
+        "title": "Succès !",
+        "description": "Vos exercices ont été générés."
+      }
+    }
+  },
+  "lessonPlanning": {
+    "header": {
+      "title": "Planification de Leçon",
+      "description": "Créez des plans de cours détaillés avec l'aide de l'IA."
+    },
+    "form": {
+      "title": "Paramètres de la Leçon",
+      "description": "Remplissez les détails pour générer le plan de cours.",
+      "topic": {
+        "label": "Sujet de la Leçon",
+        "placeholder": "Ex: L'imparfait et le passé simple"
+      },
+      "sessions": {
+        "label": "Nombre de séances"
+      },
+      "prerequisites": {
+        "label": "Connaissances Préalables (Optionnel)",
+        "placeholder": "Décrivez ce que les élèves savent déjà..."
+      },
+      "submit": "Générer le Plan de Leçon"
+    },
+    "results": {
+      "title": "Plan de Leçon Généré",
+      "description": "Voici le plan de cours détaillé généré par l'IA.",
+      "placeholder": "Le plan de cours généré apparaîtra ici.",
+      "downloadPdf": "Télécharger en PDF"
+    },
+    "toast": {
+      "success": {
+        "title": "Succès !",
+        "description": "Votre plan de cours a été généré."
+      },
+      "pdfError": "Impossible de trouver le contenu du plan de cours pour générer le PDF.",
+      "downloadSuccess": {
+        "title": "Téléchargement Réussi",
+        "description": "Le PDF du plan de cours a été téléchargé."
+      }
+    }
+  }
+}

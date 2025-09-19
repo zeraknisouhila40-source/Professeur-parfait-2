@@ -8,6 +8,7 @@ import { suggestExamQuestions, type SuggestExamQuestionsInput, type SuggestExamQ
 import { marked } from 'marked';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +36,7 @@ type FormValues = z.infer<typeof formSchema>;
 type ExamSuggestion = SuggestExamQuestionsOutput['suggestions'][0];
 
 export default function ExamSuggestionPage() {
+  const { t, language } = useTranslation();
   const [examSuggestions, setExamSuggestions] = useState<SuggestExamQuestionsOutput['suggestions']>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -49,23 +51,23 @@ export default function ExamSuggestionPage() {
     },
   });
 
-  const level = form.watch('level');
+  const levelValue = form.watch('level');
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
     setExamSuggestions([]);
     try {
-      const result = await suggestExamQuestions({ ...data, numberOfSuggestions: 2 } as SuggestExamQuestionsInput);
+      const result = await suggestExamQuestions({ ...data, numberOfSuggestions: 2, language } as SuggestExamQuestionsInput);
       setExamSuggestions(result.suggestions);
       toast({
-        title: 'Success!',
-        description: 'Your exam suggestions have been generated.',
+        title: t('examSuggestion.toast.success.title'),
+        description: t('examSuggestion.toast.success.description'),
       });
     } catch (error) {
       console.error(error);
       toast({
-        title: 'Error',
-        description: 'An error occurred while generating questions. Please try again.',
+        title: t('common.error.title'),
+        description: t('common.error.description'),
         variant: 'destructive',
       });
     } finally {
@@ -90,7 +92,7 @@ export default function ExamSuggestionPage() {
       const headerElement = document.getElementById(`pdf-header-${index}`);
 
       if (!examPaperElement || !answerKeyElement || !headerElement) {
-        toast({ title: 'Error', description: "Could not find exam content.", variant: 'destructive' });
+        toast({ title: t('common.error.title'), description: t('examSuggestion.toast.pdfError'), variant: 'destructive' });
         setIsDownloading(false);
         return;
       }
@@ -114,16 +116,17 @@ export default function ExamSuggestionPage() {
           const headerImgHeight = (headerImgProps.height * pdfWidth) / headerImgProps.width;
           pdf.addImage(headerImgData, 'PNG', 0, 0, pdfWidth, headerImgHeight);
           position = headerImgHeight;
-          heightLeft = imgHeight;
         }
 
+        let page = 1;
         while (heightLeft > 0) {
-          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-          heightLeft -= (pdfHeight - position);
-          if (heightLeft > 0) {
-            pdf.addPage();
-            position = -pdfHeight * (Math.floor(imgHeight / (pdfHeight-position)) -1) ;
+          if(page > 1) {
+             pdf.addPage();
           }
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+          heightLeft -= pdfHeight;
+          position -= pdfHeight;
+          page++;
         }
       };
 
@@ -133,10 +136,10 @@ export default function ExamSuggestionPage() {
       
       pdf.save(`${suggestion.title.replace(/ /g, '_')}.pdf`);
       
-      toast({ title: 'Download Successful', description: 'The exam PDF has been downloaded.' });
+      toast({ title: t('examSuggestion.toast.downloadSuccess.title'), description: t('examSuggestion.toast.downloadSuccess.description') });
     } catch (error) {
       console.error('Error generating PDF:', error);
-      toast({ title: 'Download Error', description: 'An error occurred while creating the PDF.', variant: 'destructive' });
+      toast({ title: t('examSuggestion.toast.pdfError'), description: String(error), variant: 'destructive' });
     } finally {
       setIsDownloading(false);
     }
@@ -170,8 +173,8 @@ export default function ExamSuggestionPage() {
   const handleCopy = (content: string) => {
     navigator.clipboard.writeText(content);
     toast({
-      title: 'Copied!',
-      description: "The exam content has been copied to the clipboard.",
+      title: t('common.copied.title'),
+      description: t('common.copied.description'),
     });
   };
 
@@ -179,16 +182,16 @@ export default function ExamSuggestionPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Exam Suggestion"
-        description="Generate complete, customized exams in seconds."
+        title={t('examSuggestion.header.title')}
+        description={t('examSuggestion.header.description')}
       />
       <div className="hidden"><PdfHeader id="pdf-header-print" /></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
             <Card className="sticky top-20">
                 <CardHeader>
-                    <CardTitle>Exam Parameters</CardTitle>
-                    <CardDescription>Fill in the details to generate suggestions.</CardDescription>
+                    <CardTitle>{t('examSuggestion.form.title')}</CardTitle>
+                    <CardDescription>{t('examSuggestion.form.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
@@ -198,16 +201,16 @@ export default function ExamSuggestionPage() {
                             name="level"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Level</FormLabel>
+                                <FormLabel>{t('common.level.label')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select level" />
+                                        <SelectValue placeholder={t('common.level.placeholder')} />
                                     </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                    <SelectItem value="Middle School">Middle School</SelectItem>
-                                    <SelectItem value="High School">High School</SelectItem>
+                                    <SelectItem value="Middle School">{t('common.level.middleSchool')}</SelectItem>
+                                    <SelectItem value="High School">{t('common.level.highSchool')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -219,18 +222,18 @@ export default function ExamSuggestionPage() {
                             name="year"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Year</FormLabel>
+                                <FormLabel>{t('common.year.label')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select year" />
+                                        <SelectValue placeholder={t('common.year.placeholder')} />
                                     </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="1st year">1st year</SelectItem>
-                                        <SelectItem value="2nd year">2nd year</SelectItem>
-                                        <SelectItem value="3rd year">3rd year</SelectItem>
-                                        {level === 'Middle School' && <SelectItem value="4th year">4th year (for middle school)</SelectItem>}
+                                        <SelectItem value="1st year">{t('common.year.1st')}</SelectItem>
+                                        <SelectItem value="2nd year">{t('common.year.2nd')}</SelectItem>
+                                        <SelectItem value="3rd year">{t('common.year.3rd')}</SelectItem>
+                                        {levelValue === 'Middle School' && <SelectItem value="4th year">{t('common.year.4th')}</SelectItem>}
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -242,17 +245,17 @@ export default function ExamSuggestionPage() {
                             name="trimester"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Trimester</FormLabel>
+                                <FormLabel>{t('common.trimester.label')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                     <SelectTrigger>
-                                        <SelectValue placeholder="Select trimester" />
+                                        <SelectValue placeholder={t('common.trimester.placeholder')} />
                                     </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                    <SelectItem value="1st trimester">1st trimester</SelectItem>
-                                    <SelectItem value="2nd trimester">2nd trimester</SelectItem>
-                                    <SelectItem value="3rd trimester">3rd trimester</SelectItem>
+                                    <SelectItem value="1st trimester">{t('common.trimester.1st')}</SelectItem>
+                                    <SelectItem value="2nd trimester">{t('common.trimester.2nd')}</SelectItem>
+                                    <SelectItem value="3rd trimester">{t('common.trimester.3rd')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
@@ -264,9 +267,9 @@ export default function ExamSuggestionPage() {
                             name="topic"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Topic (Optional)</FormLabel>
+                                <FormLabel>{t('examSuggestion.form.topic.label')}</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Ex: The Algerian Revolution" {...field} />
+                                    <Input placeholder={t('examSuggestion.form.topic.placeholder')} {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -277,9 +280,9 @@ export default function ExamSuggestionPage() {
                             name="keywords"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Keywords (Optional)</FormLabel>
+                                <FormLabel>{t('examSuggestion.form.keywords.label')}</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Ex: History, Culture, Characters" {...field} />
+                                    <Input placeholder={t('examSuggestion.form.keywords.placeholder')} {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -290,7 +293,7 @@ export default function ExamSuggestionPage() {
                             name="numberOfQuestions"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Number of questions</FormLabel>
+                                <FormLabel>{t('examSuggestion.form.numberOfQuestions.label')}</FormLabel>
                                 <FormControl>
                                     <Input type="number" min="1" max="10" {...field} />
                                 </FormControl>
@@ -300,7 +303,7 @@ export default function ExamSuggestionPage() {
                         />
                         <Button type="submit" disabled={isLoading} className="w-full">
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Generate Suggestions
+                            {t('examSuggestion.form.submit')}
                         </Button>
                     </form>
                     </Form>
@@ -310,8 +313,8 @@ export default function ExamSuggestionPage() {
         <div className="lg:col-span-2">
             <Card className="min-h-full">
                 <CardHeader>
-                    <CardTitle>Exam Suggestions</CardTitle>
-                    <CardDescription>Here are the AI-generated suggestions. Choose one.</CardDescription>
+                    <CardTitle>{t('examSuggestion.results.title')}</CardTitle>
+                    <CardDescription>{t('examSuggestion.results.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {isLoading && (
@@ -321,8 +324,8 @@ export default function ExamSuggestionPage() {
                     )}
                     {!isLoading && examSuggestions.length === 0 && (
                         <div className="flex flex-col items-center justify-center text-center text-muted-foreground p-8 border-2 border-dashed rounded-lg h-96">
-                            <p>Exam suggestions will appear here.</p>
-                            <p className="text-sm">Fill out the form and click "Generate".</p>
+                            <p>{t('examSuggestion.results.placeholder1')}</p>
+                            <p className="text-sm">{t('examSuggestion.results.placeholder2')}</p>
                         </div>
                     )}
                     {examSuggestions.length > 0 && (
@@ -341,21 +344,21 @@ export default function ExamSuggestionPage() {
                                         <div className="space-y-4 pt-2">
                                             <Tabs defaultValue="exam-paper" className="w-full">
                                                 <TabsList className="grid w-full grid-cols-2">
-                                                    <TabsTrigger value="exam-paper">Exam Paper</TabsTrigger>
-                                                    <TabsTrigger value="answer-key">Answer Key</TabsTrigger>
+                                                    <TabsTrigger value="exam-paper">{t('examSuggestion.results.tabs.examPaper')}</TabsTrigger>
+                                                    <TabsTrigger value="answer-key">{t('examSuggestion.results.tabs.answerKey')}</TabsTrigger>
                                                 </TabsList>
                                                 <TabsContent value="exam-paper">
                                                     <div id={`exam-paper-${index}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.examPaper) }} />
                                                     <div className="flex gap-2 mt-2">
-                                                        <Button variant="outline" size="sm" onClick={() => handlePrint(`exam-paper-${index}`)}><Printer className="mr-2 h-4 w-4" /> Print</Button>
-                                                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.examPaper)}><Copy className="mr-2 h-4 w-4" /> Copy</Button>
+                                                        <Button variant="outline" size="sm" onClick={() => handlePrint(`exam-paper-${index}`)}><Printer className="mr-2 h-4 w-4" /> {t('common.print')}</Button>
+                                                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.examPaper)}><Copy className="mr-2 h-4 w-4" /> {t('common.copy')}</Button>
                                                     </div>
                                                 </TabsContent>
                                                 <TabsContent value="answer-key">
                                                     <div id={`answer-key-${index}`} className="prose prose-sm max-w-none dark:prose-invert bg-background/50 p-4 rounded-md border mt-2 min-h-60" dangerouslySetInnerHTML={{ __html: getHtml(suggestion.answerKey) }} />
                                                      <div className="flex gap-2 mt-2">
-                                                        <Button variant="outline" size="sm" onClick={() => handlePrint(`answer-key-${index}`)}><Printer className="mr-2 h-4 w-4" /> Print</Button>
-                                                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.answerKey)}><Copy className="mr-2 h-4 w-4" /> Copy</Button>
+                                                        <Button variant="outline" size="sm" onClick={() => handlePrint(`answer-key-${index}`)}><Printer className="mr-2 h-4 w-4" /> {t('common.print')}</Button>
+                                                        <Button variant="outline" size="sm" onClick={() => handleCopy(suggestion.answerKey)}><Copy className="mr-2 h-4 w-4" /> {t('common.copy')}</Button>
                                                     </div>
                                                 </TabsContent>
                                             </Tabs>
@@ -371,7 +374,7 @@ export default function ExamSuggestionPage() {
                                                 ) : (
                                                   <Download className="mr-2 h-4 w-4" />
                                                 )}
-                                                Download Subject & Key as PDF
+                                                {t('examSuggestion.results.downloadPdf')}
                                               </Button>
                                             </div>
                                         </div>

@@ -28,6 +28,7 @@ const AiAssistedLessonPlanningInputSchema = z.object({
   level: z.string().describe("The educational level (e.g., 'middle', 'secondary')."),
   year: z.string().describe("The year within the educational level (e.g., '1st year')."),
   trimester: z.string().describe("The trimester (e.g., '1st trimester')."),
+  language: z.enum(['en', 'fr']).describe('The language for the lesson plan.'),
 });
 export type AiAssistedLessonPlanningInput = z.infer<
   typeof AiAssistedLessonPlanningInputSchema
@@ -54,7 +55,7 @@ const prompt = ai.definePrompt({
   name: 'aiAssistedLessonPlanningPrompt',
   input: {schema: AiAssistedLessonPlanningInputSchema},
   output: {schema: AiAssistedLessonPlanningOutputSchema},
-  prompt: `You are an AI assistant designed to help English teachers in Algeria create effective lesson plans based on the Algerian education system.
+  prompt: `You are an AI assistant designed to help {{language === 'fr' ? 'French' : 'English'}} teachers in Algeria create effective lesson plans based on the Algerian education system.
 
   Based on the topic, number of class meetings, and prerequisite knowledge provided, generate a comprehensive lesson plan that includes clear objectives, engaging activities, and appropriate assessments.
 
@@ -67,7 +68,7 @@ const prompt = ai.definePrompt({
   Prerequisite Knowledge: {{{prerequisiteKnowledge}}}
   {{/if}}
 
-  Ensure the lesson plan is well-structured and aligned with the Algerian educational guidelines for teaching English.
+  Ensure the lesson plan is well-structured and aligned with the Algerian educational guidelines for teaching {{language === 'fr' ? 'French' : 'English'}}.
 
   Output the lesson plan in a detailed, easy-to-understand format using Markdown.
   Use bold and underlined titles for main sections (e.g., **__Objectives__**).
