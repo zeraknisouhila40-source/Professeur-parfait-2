@@ -156,6 +156,48 @@
       }
     }
   },
+  "homeworkCreation": {
+    "header": {
+      "title": "Homework Creation",
+      "description": "Generate tailored homework exercises for your students."
+    },
+    "form": {
+      "title": "Homework Parameters",
+      "description": "Fill in the details to generate exercises.",
+      "topic": {
+        "label": "Topic",
+        "placeholder": "Ex: Past simple tense"
+      },
+      "skillLevel": {
+        "label": "Skill Level",
+        "placeholder": "Select skill level",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+      },
+      "quantity": {
+        "label": "Number of exercises"
+      },
+      "submit": "Generate Exercises"
+    },
+    "results": {
+      "title": "Generated Exercises",
+      "description": "Here are the AI-generated homework exercises.",
+      "placeholder": "The generated exercises will appear here.",
+      "downloadPdf": "Download as PDF"
+    },
+    "toast": {
+      "success": {
+        "title": "Success!",
+        "description": "Your homework exercises have been generated."
+      },
+      "pdfError": "Could not find homework content to generate the PDF.",
+      "downloadSuccess": {
+        "title": "Download Successful",
+        "description": "The homework PDF has been downloaded."
+      }
+    }
+  },
   "lessonPlanning": {
     "header": {
       "title": "Lesson Planning",
@@ -196,3 +238,5 @@
     }
   }
 }
+
+    

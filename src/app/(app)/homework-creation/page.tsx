@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { generateHomeworkExercises } from '@/ai/flows/generate-homework-exercises';
 import type { GenerateHomeworkExercisesInput } from '@/ai/flows/generate-homework-exercises-types';
+import jsPDF from 'jspdf';
 import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Printer, Copy } from 'lucide-react';
+import { Loader2, Printer, Copy, Download } from 'lucide-react';
 import { PdfHeader } from '@/components/pdf-header';
 
 const formSchema = z.object({
@@ -33,6 +34,7 @@ export default function HomeworkCreationPage() {
   const { t, language } = useTranslation();
   const [generatedExercises, setGeneratedExercises] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -67,11 +69,66 @@ export default function HomeworkCreationPage() {
       setIsLoading(false);
     }
   };
+  
+  const getHtmlForPdf = (exercises: string[]) => {
+    return `
+      <h2>${t('homeworkCreation.results.title')}</h2>
+      <ol>
+        ${exercises.map(ex => `<li>${ex}</li>`).join('')}
+      </ol>
+    `;
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!generatedExercises.length) return;
+    setIsDownloading(true);
+
+    try {
+      const headerElement = document.getElementById('pdf-header-homework');
+
+      if (!headerElement) {
+        toast({ title: t('common.error.title'), description: t('homeworkCreation.toast.pdfError'), variant: 'destructive' });
+        setIsDownloading(false);
+        return;
+      }
+      
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const safeFont = 'Helvetica';
+      pdf.setFont(safeFont);
+      
+      const combinedHtml = `
+        <div style="font-family: ${safeFont}; color: black; width: 525pt; padding: 35pt; font-size: 12px;">
+          ${headerElement.innerHTML}
+          ${getHtmlForPdf(generatedExercises)}
+        </div>
+      `;
+
+      await new Promise<void>((resolve) => {
+        pdf.html(combinedHtml, {
+          callback: function (doc) {
+            doc.save(`Homework_${form.getValues('topic').replace(/ /g, '_')}.pdf`);
+            resolve();
+          },
+          autoPaging: 'text',
+          margin: [40, 40, 40, 40],
+          windowWidth: 700,
+          width: 525
+        });
+      });
+
+      toast({ title: t('homeworkCreation.toast.downloadSuccess.title'), description: t('homeworkCreation.toast.downloadSuccess.description') });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({ title: t('homeworkCreation.toast.pdfError'), description: String(error), variant: 'destructive' });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const handlePrint = () => {
     const printContent = document.getElementById('homework-exercises');
     if (printContent) {
-      const header = document.getElementById('pdf-header-print');
+      const header = document.getElementById('pdf-header-homework');
       const headerHTML = header ? header.innerHTML : '';
       const contentHTML = printContent.innerHTML;
       const printWindow = window.open('', '_blank');
@@ -106,7 +163,7 @@ export default function HomeworkCreationPage() {
         title={t('homeworkCreation.header.title')}
         description={t('homeworkCreation.header.description')}
       />
-       <div className="hidden"><PdfHeader id="pdf-header-print" /></div>
+       <div className="hidden"><PdfHeader id="pdf-header-homework" /></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-1">
           <Card className="sticky top-20">
@@ -260,13 +317,24 @@ export default function HomeworkCreationPage() {
               {generatedExercises.length > 0 && (
                 <div className="space-y-4">
                   <div id="homework-exercises">
-                    <ol className="list-decimal list-outside space-y-3 pl-5">
+                    <ol className="list-decimal list-outside space-y-3 pl-5 bg-secondary/50 p-4 rounded-md">
                       {generatedExercises.map((ex, index) => (
-                        <li key={index} className="bg-secondary/50 p-3 rounded-md pl-4">{ex}</li>
+                        <li key={index} className="pl-2">{ex}</li>
                       ))}
                     </ol>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      onClick={handleDownloadPdf}
+                      disabled={isDownloading}
+                    >
+                      {isDownloading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Download className="mr-2 h-4 w-4" />
+                      )}
+                      {t('homeworkCreation.results.downloadPdf')}
+                    </Button>
                     <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> {t('common.print')}</Button>
                     <Button variant="outline" onClick={handleCopy}><Copy className="mr-2 h-4 w-4" /> {t('common.copy')}</Button>
                   </div>
@@ -279,3 +347,5 @@ export default function HomeworkCreationPage() {
     </div>
   );
 }
+
+    

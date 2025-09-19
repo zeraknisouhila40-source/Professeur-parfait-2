@@ -156,6 +156,48 @@
       }
     }
   },
+   "homeworkCreation": {
+    "header": {
+      "title": "Création de Devoirs",
+      "description": "Générez des exercices de devoirs sur mesure pour vos élèves."
+    },
+    "form": {
+      "title": "Paramètres des Devoirs",
+      "description": "Remplissez les détails pour générer des exercices.",
+      "topic": {
+        "label": "Sujet",
+        "placeholder": "Ex: Le passé simple"
+      },
+      "skillLevel": {
+        "label": "Niveau de compétence",
+        "placeholder": "Sélectionner le niveau de compétence",
+        "beginner": "Débutant",
+        "intermediate": "Intermédiaire",
+        "advanced": "Avancé"
+      },
+      "quantity": {
+        "label": "Nombre d'exercices"
+      },
+      "submit": "Générer les Exercices"
+    },
+    "results": {
+      "title": "Exercices Générés",
+      "description": "Voici les exercices de devoirs générés par l'IA.",
+      "placeholder": "Les exercices générés apparaîtront ici.",
+      "downloadPdf": "Télécharger en PDF"
+    },
+    "toast": {
+      "success": {
+        "title": "Succès !",
+        "description": "Vos exercices de devoirs ont été générés."
+      },
+      "pdfError": "Impossible de trouver le contenu des devoirs pour générer le PDF.",
+      "downloadSuccess": {
+        "title": "Téléchargement Réussi",
+        "description": "Le PDF des devoirs a été téléchargé."
+      }
+    }
+  },
   "lessonPlanning": {
     "header": {
       "title": "Planification de Leçon",
@@ -196,3 +238,5 @@
     }
   }
 }
+
+    
