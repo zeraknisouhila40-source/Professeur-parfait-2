@@ -294,7 +294,7 @@ export default function ExamSuggestionPage() {
                                     <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder={t('common.trimester.placeholder')} />
-                                    </Trigger>
+                                    </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
                                     <SelectItem value="1st trimester">{t('common.trimester.1st')}</SelectItem>
@@ -376,14 +376,14 @@ export default function ExamSuggestionPage() {
                         <div className="space-y-6">
                            {comprehensiveExams.length > 0 && (
                             <div className="space-y-4">
-                              <h2 className="text-xl font-bold">{t('language') === 'fr' ? 'Épreuves de synthèse' : 'Comprehensive Exams'}</h2>
+                              <h2 className="text-xl font-bold">{language === 'fr' ? 'Épreuves de synthèse' : 'Comprehensive Exams'}</h2>
                               {comprehensiveExams.map((suggestion, index) => renderSuggestion(suggestion, index, 'comprehensive'))}
                             </div>
                           )}
 
                           {onSheetExams.length > 0 && (
                             <div className="space-y-4">
-                              <h2 className="text-xl font-bold">{t('language') === 'fr' ? 'Épreuves à remplir' : 'On-Sheet Exams'}</h2>
+                              <h2 className="text-xl font-bold">{language === 'fr' ? 'Épreuves à remplir' : 'On-Sheet Exams'}</h2>
                               {onSheetExams.map((suggestion, index) => renderSuggestion(suggestion, index, 'on-sheet'))}
                             </div>
                           )}
