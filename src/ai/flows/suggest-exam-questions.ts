@@ -58,11 +58,20 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestExamQuestionsOutputSchema},
   prompt: `You are an AI assistant designed to help {{language === 'fr' ? 'French' : 'English'}} teachers in Algeria create complete exams based on the Algerian education system.
 
-  Generate exactly {{numberOfSuggestions}} distinct exam suggestions.
+  Generate exactly {{numberOfSuggestions}} distinct exam suggestions. Each suggestion must include a complete exam paper and a separate answer key.
 
-  The first suggestion should be a comprehensive composition exam. This type of exam should be designed for students to write their answers on a separate paper. It should include a text for comprehension, followed by questions, grammar exercises, and a writing section.
-
-  The second suggestion should be an exam where students write their answers directly on the exam paper itself. This exam should be 2-3 pages long and must include ample empty space for answers after each question. It should also include tables for students to fill in.
+  **First Suggestion (Comprehensive Exam - "Épreuve de synthèse"):**
+  This exam should be a comprehensive composition exam, designed for students to write their answers on a separate paper. It must include:
+  1.  A text for reading comprehension.
+  2.  A series of questions based on the text.
+  3.  Grammar and vocabulary exercises.
+  4.  A writing section (expression écrite).
+  
+  **Second Suggestion (Fill-in-the-blanks Exam - "Épreuve à remplir"):**
+  This exam should be an "on-sheet" test where students write their answers directly in the spaces provided. It must be 2-3 pages long and include:
+  1.  Ample empty space for answers after each question.
+  2.  Tables for students to fill in (e.g., verb conjugations, vocabulary matching).
+  3.  Fill-in-the-blank questions or multiple-choice questions.
 
   {{#if topic}}
   The suggestions should be on the topic of "{{topic}}".
@@ -71,14 +80,13 @@ const prompt = ai.definePrompt({
   The suggestions should incorporate the following keywords: "{{keywords}}".
   {{/if}}
 
-  Each suggestion must have a unique title, a complete exam paper with {{numberOfQuestions}} questions, and a separate answer key.
+  Each suggestion must have a unique and descriptive title (e.g., "Épreuve de Synthèse sur..." or "Examen à Remplir sur...").
   The questions must align with the Algerian curriculum for the educational level: {{level}}, {{year}}, for the {{trimester}}.
 
-  For each suggestion, provide two parts:
-  1.  **examPaper**: The full exam paper, ready to be given to students. It must be well-formatted using Markdown. Include tables for scoring points for each exercise. If an image is relevant, use a Markdown placeholder like '![Image description](https://picsum.photos/seed/1/600/400)'. Use a different seed for each image.
-  2.  **answerKey**: A separate, complete answer key for the teacher, also formatted in Markdown.
+  For each of the two suggestions, provide two distinct parts:
+  1.  **examPaper**: The full exam paper, well-formatted using Markdown, ready to be given to students. It must include scoring tables for each section (barème de notation). If an image is relevant, use a Markdown placeholder like '![Image description](https://picsum.photos/seed/1/600/400)'. Use a different seed for each image.
+  2.  **answerKey**: A separate, complete, and detailed answer key ("corrigé") for the teacher, also formatted in Markdown.
 
-  Ensure that the content is relevant, comprehensive, and appropriate for the specified educational level.
   The final output must be a JSON object that strictly follows this schema:
   
   {
