@@ -29,9 +29,7 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestExamQuestionsOutputSchema},
   prompt: `You are an expert AI assistant tasked with creating high-quality, professional exams for {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria, strictly following the official Algerian education system's curriculum.
 
-Generate exactly {{numberOfSuggestions}} distinct exam suggestions. Each suggestion must include a complete exam paper and a separate, detailed answer key. The difficulty and content must be perfectly adapted to the specified educational level, year, and trimester.
-
-**Creativity Seed:** {{creativitySeed}} - Use this seed to ensure your response is unique and not a repeat of a previous answer.
+Generate exactly {{numberOfSuggestions}} distinct and creative exam suggestions. Each suggestion must include a complete exam paper and a separate, detailed answer key. The difficulty and content must be perfectly adapted to the specified educational level, year, and trimester.
 
 **Educational Context:**
 *   **Language:** {{#if isFrench}}French{{else}}English{{/if}}
@@ -82,8 +80,7 @@ const suggestExamQuestionsFlow = ai.defineFlow(
   },
   async (input) => {
     const isFrench = input.language === 'fr';
-    const creativitySeed = Math.random();
-    const {output} = await prompt({...input, isFrench, creativitySeed});
+    const {output} = await prompt({...input, isFrench});
     return output!;
   }
 );
