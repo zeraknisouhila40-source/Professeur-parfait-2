@@ -96,9 +96,11 @@ export default function LessonPlanningPage() {
       }
       
       const pdf = new jsPDF('p', 'pt', 'a4');
+      const safeFont = 'Helvetica';
+      pdf.setFont(safeFont);
       
       const combinedHtml = `
-        <div style="font-family: 'PT Sans', sans-serif; color: black; width: 525pt; padding: 35pt;">
+        <div style="font-family: ${safeFont}; color: black; width: 525pt; padding: 35pt;">
           ${headerElement.innerHTML}
           ${lessonPlanElement.innerHTML}
         </div>
@@ -112,6 +114,7 @@ export default function LessonPlanningPage() {
           scale: 0.7
         },
         autoPaging: 'text',
+        margin: [40, 40, 40, 40]
       });
 
       toast({ title: t('lessonPlanning.toast.downloadSuccess.title'), description: t('lessonPlanning.toast.downloadSuccess.description') });

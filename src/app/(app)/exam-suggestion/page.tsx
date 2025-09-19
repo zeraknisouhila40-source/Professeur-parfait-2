@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { suggestExamQuestions, type SuggestExamQuestionsInput, type SuggestExamQuestionsOutput } from '@/ai/flows/suggest-exam-questions';
 import { marked } from 'marked';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { useTranslation } from '@/hooks/use-translation';
 
 import { Button } from '@/components/ui/button';
@@ -39,7 +38,7 @@ export default function ExamSuggestionPage() {
   const { t, language } = useTranslation();
   const [examSuggestions, setExamSuggestions] = useState<SuggestExamQuestionsOutput['suggestions']>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState<number | null>(null);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -85,7 +84,7 @@ export default function ExamSuggestionPage() {
   }
 
   const handleDownloadPdf = async (suggestion: ExamSuggestion, index: number) => {
-    setIsDownloading(true);
+    setIsDownloading(index);
     try {
       const examPaperElement = document.getElementById(`exam-paper-${index}`);
       const answerKeyElement = document.getElementById(`answer-key-${index}`);
@@ -93,46 +92,33 @@ export default function ExamSuggestionPage() {
 
       if (!examPaperElement || !answerKeyElement || !headerElement) {
         toast({ title: t('common.error.title'), description: t('examSuggestion.toast.pdfError'), variant: 'destructive' });
-        setIsDownloading(false);
+        setIsDownloading(null);
         return;
       }
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      const addContentToPdf = async (element: HTMLElement, withHeader: boolean) => {
-        const canvas = await html2canvas(element, { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
-        const imgProps = pdf.getImageProperties(imgData);
-        let imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        let heightLeft = imgHeight;
-        let position = 0;
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const safeFont = 'Helvetica';
+      pdf.setFont(safeFont);
 
-        if (withHeader) {
-          const headerCanvas = await html2canvas(headerElement, { scale: 2 });
-          const headerImgData = headerCanvas.toDataURL('image/png');
-          const headerImgProps = pdf.getImageProperties(headerImgData);
-          const headerImgHeight = (headerImgProps.height * pdfWidth) / headerImgProps.width;
-          pdf.addImage(headerImgData, 'PNG', 0, 0, pdfWidth, headerImgHeight);
-          position = headerImgHeight;
-        }
-
-        let page = 1;
-        while (heightLeft > 0) {
-          if(page > 1) {
-             pdf.addPage();
-          }
-          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-          heightLeft -= pdfHeight;
-          position -= pdfHeight;
-          page++;
-        }
+      const addContentToPdf = async (element: HTMLElement, title: string, withHeader: boolean) => {
+        const combinedHtml = `
+          <div style="font-family: ${safeFont}; color: black; width: 525pt; padding: 35pt;">
+            ${withHeader ? headerElement.innerHTML : ''}
+            <h2>${title}</h2>
+            ${element.innerHTML}
+          </div>
+        `;
+        await pdf.html(combinedHtml, {
+          callback: (doc) => {},
+          html2canvas: { scale: 0.7 },
+          autoPaging: 'text',
+          margin: [40, 40, 40, 40]
+        });
       };
 
-      await addContentToPdf(examPaperElement, true);
+      await addContentToPdf(examPaperElement, t('examSuggestion.results.tabs.examPaper'), true);
       pdf.addPage();
-      await addContentToPdf(answerKeyElement, false);
+      await addContentToPdf(answerKeyElement, t('examSuggestion.results.tabs.answerKey'), false);
       
       pdf.save(`${suggestion.title.replace(/ /g, '_')}.pdf`);
       
@@ -141,7 +127,7 @@ export default function ExamSuggestionPage() {
       console.error('Error generating PDF:', error);
       toast({ title: t('examSuggestion.toast.pdfError'), description: String(error), variant: 'destructive' });
     } finally {
-      setIsDownloading(false);
+      setIsDownloading(null);
     }
   };
 
@@ -366,10 +352,10 @@ export default function ExamSuggestionPage() {
                                               <Button
                                                 variant="outline"
                                                 onClick={() => handleDownloadPdf(suggestion, index)}
-                                                disabled={isDownloading}
+                                                disabled={isDownloading === index}
                                                 className="w-full"
                                               >
-                                                {isDownloading ? (
+                                                {isDownloading === index ? (
                                                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                                 ) : (
                                                   <Download className="mr-2 h-4 w-4" />
