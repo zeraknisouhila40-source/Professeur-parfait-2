@@ -46,16 +46,22 @@ export type SuggestExamQuestionsOutput = z.infer<
   typeof SuggestExamQuestionsOutputSchema
 >;
 
+const FlowInputSchema = SuggestExamQuestionsInputSchema.extend({
+  isFrench: z.boolean().optional(),
+});
+
 export async function suggestExamQuestions(
   input: SuggestExamQuestionsInput
 ): Promise<SuggestExamQuestionsOutput> {
-  const isFrench = input.language === 'fr';
-  return suggestExamQuestionsFlow({...input, isFrench} as any);
+  return suggestExamQuestionsFlow({
+    ...input,
+    isFrench: input.language === 'fr',
+  });
 }
 
 const prompt = ai.definePrompt({
   name: 'suggestExamQuestionsPrompt',
-  input: {schema: SuggestExamQuestionsInputSchema.extend({ isFrench: z.boolean().optional() })},
+  input: {schema: FlowInputSchema},
   output: {schema: SuggestExamQuestionsOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create complete exams based on the Algerian education system.
 
@@ -110,7 +116,7 @@ const prompt = ai.definePrompt({
 const suggestExamQuestionsFlow = ai.defineFlow(
   {
     name: 'suggestExamQuestionsFlow',
-    inputSchema: SuggestExamQuestionsInputSchema.extend({ isFrench: z.boolean().optional() }),
+    inputSchema: FlowInputSchema,
     outputSchema: SuggestExamQuestionsOutputSchema,
   },
   async input => {

@@ -45,16 +45,22 @@ export type AiAssistedLessonPlanningOutput = z.infer<
   typeof AiAssistedLessonPlanningOutputSchema
 >;
 
+const FlowInputSchema = AiAssistedLessonPlanningInputSchema.extend({
+  isFrench: z.boolean().optional(),
+});
+
 export async function aiAssistedLessonPlanning(
   input: AiAssistedLessonPlanningInput
 ): Promise<AiAssistedLessonPlanningOutput> {
-  const isFrench = input.language === 'fr';
-  return aiAssistedLessonPlanningFlow({...input, isFrench} as any);
+  return aiAssistedLessonPlanningFlow({
+    ...input,
+    isFrench: input.language === 'fr',
+  });
 }
 
 const prompt = ai.definePrompt({
   name: 'aiAssistedLessonPlanningPrompt',
-  input: {schema: AiAssistedLessonPlanningInputSchema.extend({ isFrench: z.boolean().optional() })},
+  input: {schema: FlowInputSchema},
   output: {schema: AiAssistedLessonPlanningOutputSchema},
   prompt: `You are an AI assistant designed to help {{#if isFrench}}French{{else}}English{{/if}} teachers in Algeria create effective lesson plans based on the Algerian education system.
 
@@ -81,7 +87,7 @@ const prompt = ai.definePrompt({
 const aiAssistedLessonPlanningFlow = ai.defineFlow(
   {
     name: 'aiAssistedLessonPlanningFlow',
-    inputSchema: AiAssistedLessonPlanningInputSchema.extend({ isFrench: z.boolean().optional() }),
+    inputSchema: FlowInputSchema,
     outputSchema: AiAssistedLessonPlanningOutputSchema,
   },
   async input => {

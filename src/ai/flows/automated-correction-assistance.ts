@@ -38,14 +38,20 @@ const CorrectAssignmentOutputSchema = z.object({
 });
 export type CorrectAssignmentOutput = z.infer<typeof CorrectAssignmentOutputSchema>;
 
+const FlowInputSchema = CorrectAssignmentInputSchema.extend({
+  isFrench: z.boolean().optional(),
+});
+
 export async function correctAssignment(input: CorrectAssignmentInput): Promise<CorrectAssignmentOutput> {
-  const isFrench = input.language === 'fr';
-  return correctAssignmentFlow({...input, isFrench} as any);
+  return correctAssignmentFlow({
+    ...input,
+    isFrench: input.language === 'fr',
+  });
 }
 
 const prompt = ai.definePrompt({
   name: 'correctAssignmentPrompt',
-  input: {schema: CorrectAssignmentInputSchema.extend({ isFrench: z.boolean().optional() })},
+  input: {schema: FlowInputSchema},
   output: {schema: CorrectAssignmentOutputSchema},
   prompt: `You are an expert {{#if isFrench}}French{{else}}English{{/if}} teacher specializing in identifying common errors and suggesting corrections in student assignments, following the Algerian education system.
 
@@ -66,7 +72,7 @@ Suggested Improvements:`,
 const correctAssignmentFlow = ai.defineFlow(
   {
     name: 'correctAssignmentFlow',
-    inputSchema: CorrectAssignmentInputSchema.extend({ isFrench: z.boolean().optional() }),
+    inputSchema: FlowInputSchema,
     outputSchema: CorrectAssignmentOutputSchema,
   },
   async input => {
