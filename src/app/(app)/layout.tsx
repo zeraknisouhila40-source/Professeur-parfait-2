@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Nav } from '@/components/nav';
 import {
   SidebarProvider,
@@ -11,67 +11,36 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/icons';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Image from 'next/image';
 import { useTranslation, LanguageProvider } from '@/hooks/use-translation';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Pen } from 'lucide-react';
-
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronsUpDown, UserPlus, Settings } from 'lucide-react';
+import { TeacherManager } from '@/components/teacher-manager';
 
 function AppLayoutContent({ children }: { children: React.ReactNode }) {
-  const { t, language, setLanguage, teacherName, setTeacherName } = useTranslation();
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [name, setName] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const { t, activeTeacher, teachers, setActiveTeacherId } = useTranslation();
+  const [isManagerOpen, setIsManagerOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
-    if(isMounted) {
-      setName(teacherName);
-    }
-  }, [teacherName, isMounted]);
-
-  useEffect(() => {
-    if (isEditingName && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isEditingName]);
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  };
-
-  const handleNameSave = () => {
-    setTeacherName(name);
-    setIsEditingName(false);
-  };
-
-  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleNameSave();
-    }
-    if (e.key === 'Escape') {
-      setName(teacherName);
-      setIsEditingName(false);
-    }
-  };
-
-  if (!isMounted) {
-    return null; // or a loading skeleton
+  if (!isMounted || !activeTeacher) {
+    // You can return a loading skeleton here if you want
+    return null;
   }
-
 
   return (
     <SidebarProvider>
@@ -88,57 +57,35 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
           <Nav />
         </SidebarContent>
         <SidebarFooter>
-          <div className="flex items-center gap-3 p-2">
-            <Avatar className="h-9 w-9">
-              <Image src="https://picsum.photos/seed/prof/40/40" width={40} height={40} alt="Avatar" data-ai-hint="teacher portrait" />
-              <AvatarFallback>PP</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              {isEditingName ? (
-                <div className="space-y-2">
-                  <Input
-                    ref={inputRef}
-                    type="text"
-                    value={name}
-                    onChange={handleNameChange}
-                    onBlur={handleNameSave}
-                    onKeyDown={handleNameKeyDown}
-                    className="h-7 text-sm"
-                    placeholder={t('common.teacherName')}
-                  />
-                  <Select
-                    value={language}
-                    onValueChange={(value) => setLanguage(value as 'en' | 'fr')}
-                  >
-                    <SelectTrigger className="h-7 text-xs text-muted-foreground">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              ) : (
-                <div 
-                  className="flex flex-col items-start"
-                >
-                  <div 
-                    className="flex items-center gap-2 cursor-pointer group p-1"
-                    onClick={() => setIsEditingName(true)}
-                    onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(true)}
-                    tabIndex={0}
-                    role="button"
-                    aria-label="Edit teacher name"
-                  >
-                    <span className="text-sm font-medium">{teacherName}</span>
-                    <Pen className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <span className="text-xs text-muted-foreground px-1">{language === 'en' ? 'English' : 'Français'}</span>
-                </div>
-              )}
+            <div className="p-2 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:px-2">
+               <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:p-2">
+                       <div className='flex items-center gap-2'>
+                         <Avatar className="h-7 w-7">
+                            <Image src="https://picsum.photos/seed/prof/40/40" width={40} height={40} alt="Avatar" data-ai-hint="teacher portrait" />
+                            <AvatarFallback>{activeTeacher.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <span className="group-data-[collapsible=icon]:hidden">{activeTeacher.name}</span>
+                       </div>
+                        <ChevronsUpDown className="h-4 w-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" side="top" align="start">
+                    <DropdownMenuLabel>{t('nav.switchTeacher')}</DropdownMenuLabel>
+                    <DropdownMenuRadioGroup value={activeTeacher.id} onValueChange={setActiveTeacherId}>
+                        {teachers.map(teacher => (
+                             <DropdownMenuRadioItem key={teacher.id} value={teacher.id}>{teacher.name}</DropdownMenuRadioItem>
+                        ))}
+                    </DropdownMenuRadioGroup>
+                    <DropdownMenuSeparator />
+                     <DropdownMenuItem onSelect={() => setIsManagerOpen(true)}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>{t('nav.manageTeachers')}</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+               </DropdownMenu>
             </div>
-          </div>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
@@ -150,10 +97,10 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
         </header>
         <main className="flex-1 p-4 sm:p-6">{children}</main>
       </SidebarInset>
+      <TeacherManager isOpen={isManagerOpen} onOpenChange={setIsManagerOpen} />
     </SidebarProvider>
   );
 }
-
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (

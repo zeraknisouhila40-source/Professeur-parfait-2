@@ -40,7 +40,32 @@
     "examSuggestion": "Exam Suggestion",
     "correctionAssistance": "Correction Assistance",
     "homeworkCreation": "Homework Creation",
-    "lessonPlanning": "Lesson Planning"
+    "lessonPlanning": "Lesson Planning",
+    "switchTeacher": "Switch Teacher",
+    "manageTeachers": "Manage Teachers",
+    "addTeacher": "Add a new teacher"
+  },
+  "teacherManager": {
+    "title": "Manage Teachers",
+    "description": "Add, edit, or remove teacher profiles.",
+    "active": "Active",
+    "name": "Name",
+    "language": "Language",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this teacher?",
+    "add": "Add Teacher",
+    "form": {
+      "addTitle": "Add New Teacher",
+      "editTitle": "Edit Teacher",
+      "nameLabel": "Teacher Name",
+      "namePlaceholder": "Enter name",
+      "languageLabel": "Language",
+      "languagePlaceholder": "Select language",
+      "cancel": "Cancel",
+      "save": "Save"
+    }
   },
   "pdf": {
     "header": {
