@@ -15,7 +15,7 @@
     "level": {
       "label": "Niveau",
       "placeholder": "Sélectionner le niveau",
-      "middleSchool": "Collège",
+      "middleSchool": "Enseignement moyen",
       "highSchool": "Lycée"
     },
     "year": {
