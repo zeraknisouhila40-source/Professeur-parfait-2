@@ -123,9 +123,17 @@
     "form": {
       "title": "Submit Assignment",
       "description": "Provide the details of the assignment to be corrected.",
+      "tabs": {
+        "text": "Text Input",
+        "image": "Image Upload"
+      },
       "studentAssignment": {
-        "label": "Student Assignment",
+        "label": "Student Assignment (Text)",
         "placeholder": "Paste the student's assignment text here..."
+      },
+      "imageUpload": {
+        "label": "Student Assignment (Image)",
+        "button": "Choose an image"
       },
       "examQuestions": {
         "label": "Exam Questions (Optional)",
@@ -145,42 +153,6 @@
       "success": {
         "title": "Correction Complete!",
         "description": "The correction has been successfully generated."
-      }
-    }
-  },
-  "homeworkCreation": {
-    "header": {
-      "title": "Homework Creation",
-      "description": "Generate homework assignments tailored to your students' level."
-    },
-    "form": {
-      "title": "Homework Parameters",
-      "description": "Fill in the details to generate exercises.",
-      "topic": {
-        "label": "Topic",
-        "placeholder": "Ex: The present subjunctive"
-      },
-      "skillLevel": {
-        "label": "Skill Level",
-        "placeholder": "Select a level",
-        "beginner": "Beginner",
-        "intermediate": "Intermediate",
-        "advanced": "Advanced"
-      },
-      "quantity": {
-        "label": "Number of exercises"
-      },
-      "submit": "Generate Exercises"
-    },
-    "results": {
-      "title": "Generated Exercises",
-      "description": "Here are the AI-generated homework exercises.",
-      "placeholder": "Generated exercises will appear here."
-    },
-    "toast": {
-      "success": {
-        "title": "Success!",
-        "description": "Your exercises have been generated."
       }
     }
   },

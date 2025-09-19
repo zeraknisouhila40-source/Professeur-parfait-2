@@ -123,9 +123,17 @@
     "form": {
       "title": "Soumettre un Devoir",
       "description": "Fournissez les détails du devoir à corriger.",
+      "tabs": {
+        "text": "Saisie de texte",
+        "image": "Télécharger une image"
+      },
       "studentAssignment": {
-        "label": "Devoir de l'élève",
+        "label": "Devoir de l'élève (Texte)",
         "placeholder": "Collez le texte du devoir de l'élève ici..."
+      },
+      "imageUpload": {
+        "label": "Devoir de l'élève (Image)",
+        "button": "Choisir une image"
       },
       "examQuestions": {
         "label": "Questions d'Examen (Optionnel)",
@@ -145,42 +153,6 @@
       "success": {
         "title": "Correction Terminée !",
         "description": "La correction a été générée avec succès."
-      }
-    }
-  },
-  "homeworkCreation": {
-    "header": {
-      "title": "Création de Devoirs",
-      "description": "Générez des devoirs adaptés au niveau de vos élèves."
-    },
-    "form": {
-      "title": "Paramètres des Devoirs",
-      "description": "Remplissez les détails pour générer des exercices.",
-      "topic": {
-        "label": "Sujet",
-        "placeholder": "Ex: Le subjonctif présent"
-      },
-      "skillLevel": {
-        "label": "Niveau de Compétence",
-        "placeholder": "Sélectionner un niveau",
-        "beginner": "Débutant",
-        "intermediate": "Intermédiaire",
-        "advanced": "Avancé"
-      },
-      "quantity": {
-        "label": "Nombre d'exercices"
-      },
-      "submit": "Générer les Exercices"
-    },
-    "results": {
-      "title": "Exercices Générés",
-      "description": "Voici les exercices de devoirs générés par l'IA.",
-      "placeholder": "Les exercices générés apparaîtront ici."
-    },
-    "toast": {
-      "success": {
-        "title": "Succès !",
-        "description": "Vos exercices ont été générés."
       }
     }
   },

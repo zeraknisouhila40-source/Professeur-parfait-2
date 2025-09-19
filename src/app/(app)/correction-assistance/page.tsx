@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,14 +16,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PageHeader } from '@/components/page-header';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, X } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const formSchema = z.object({
-  studentAssignment: z.string().min(20, { message: 'Student assignment must be at least 20 characters.' }),
+  studentAssignment: z.string().optional(),
+  studentAssignmentImage: z.string().optional(),
   examQuestions: z.string().optional(),
   topic: z.string().optional(),
   level: z.string({ required_error: 'Please select a level.' }),
+}).refine(data => data.studentAssignment || data.studentAssignmentImage, {
+  message: 'Please provide either a text assignment or an image.',
+  path: ['studentAssignment'],
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -31,16 +37,50 @@ export default function CorrectionAssistancePage() {
   const { t, language } = useTranslation();
   const [correctionResult, setCorrectionResult] = useState<CorrectAssignmentOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       studentAssignment: '',
+      studentAssignmentImage: '',
       examQuestions: '',
       topic: '',
     },
   });
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUri = reader.result as string;
+        setImagePreview(dataUri);
+        form.setValue('studentAssignmentImage', dataUri);
+        form.setValue('studentAssignment', ''); // Clear text input
+        form.clearErrors('studentAssignment');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setImagePreview(null);
+    form.setValue('studentAssignmentImage', '');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    form.setValue('studentAssignment', e.target.value);
+    if(e.target.value) {
+        clearImage();
+        form.clearErrors('studentAssignment');
+    }
+  }
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsLoading(true);
@@ -80,19 +120,59 @@ export default function CorrectionAssistancePage() {
             <CardContent>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="studentAssignment"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('correctionAssistance.form.studentAssignment.label')}</FormLabel>
-                        <FormControl>
-                          <Textarea rows={8} placeholder={t('correctionAssistance.form.studentAssignment.placeholder')} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <Tabs defaultValue="text" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="text">{t('correctionAssistance.form.tabs.text')}</TabsTrigger>
+                        <TabsTrigger value="image">{t('correctionAssistance.form.tabs.image')}</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="text" className="pt-4">
+                       <FormField
+                          control={form.control}
+                          name="studentAssignment"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('correctionAssistance.form.studentAssignment.label')}</FormLabel>
+                              <FormControl>
+                                <Textarea rows={8} placeholder={t('correctionAssistance.form.studentAssignment.placeholder')} {...field} onChange={handleTextChange} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                    </TabsContent>
+                    <TabsContent value="image" className="pt-4">
+                        <FormField
+                            control={form.control}
+                            name="studentAssignmentImage"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>{t('correctionAssistance.form.imageUpload.label')}</FormLabel>
+                                    <FormControl>
+                                        <div>
+                                            <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" id="image-upload" />
+                                            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full">
+                                                <Upload className="mr-2 h-4 w-4" />
+                                                {t('correctionAssistance.form.imageUpload.button')}
+                                            </Button>
+                                        </div>
+                                    </FormControl>
+                                     {imagePreview && (
+                                        <div className="mt-4 relative">
+                                            <Image src={imagePreview} alt="Image Preview" width={400} height={300} className="rounded-md border w-full h-auto" />
+                                            <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 h-6 w-6" onClick={clearImage}>
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    )}
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </TabsContent>
+                  </Tabs>
+                 
+                  <Separator className="my-4"/>
+
                   <FormField
                     control={form.control}
                     name="level"

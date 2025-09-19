@@ -38,8 +38,13 @@ Niveau d'éducation : {{{level}}}
 Sujet : {{{topic}}}
 Questions de l'examen : {{{examQuestions}}}
 
-Devoir de l'élève :
+{{#if studentAssignmentImage}}
+Devoir de l'élève (Image) :
+{{media url=studentAssignmentImage}}
+{{else}}
+Devoir de l'élève (Texte) :
 {{{studentAssignment}}}
+{{/if}}
 
 Devoir corrigé :
 Erreurs identifiées :
@@ -54,8 +59,13 @@ Educational Level: {{{level}}}
 Topic: {{{topic}}}
 Exam Questions: {{{examQuestions}}}
 
-Student Assignment:
+{{#if studentAssignmentImage}}
+Student Assignment (Image):
+{{media url=studentAssignmentImage}}
+{{else}}
+Student Assignment (Text):
 {{{studentAssignment}}}
+{{/if}}
 
 Corrected Assignment:
 Identified Errors:
